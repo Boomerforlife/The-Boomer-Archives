@@ -8,6 +8,8 @@ import { mockPosts } from '../data/mockData';
 
 const ArchivePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
 
   const categories = ['Manuscripts', 'Textiles', 'Industrial', 'Ephemeral'];
 
@@ -17,23 +19,36 @@ const ArchivePage = () => {
     return matchesSearch;
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const paginatedPosts = filteredPosts.slice(startIndex, startIndex + postsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-surface">
       <TopAppBar />
       <SideNavBar />
       
-      <main className="lg:ml-64 pt-24 min-h-screen">
-        <div className="max-w-5xl mx-auto px-8 py-12">
+      <main className="pt-24 min-h-screen">
+        <div className="px-8 py-12">
           {/* Search Section */}
           <section className="mb-20">
-            <div className="relative group max-w-2xl">
+            <div className="relative group w-full">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">
                 search
               </span>
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Reset to page 1 on search
+                }}
                 className="w-full bg-surface-container-low border-none border-b border-outline-variant/30 py-6 pl-14 pr-6 focus:ring-0 focus:bg-surface-container-highest transition-all duration-300 font-serif text-xl placeholder:italic placeholder:text-outline/50"
                 placeholder="Search the tactile records..."
               />
@@ -55,39 +70,91 @@ const ArchivePage = () => {
             </div>
 
             {/* Archive Items Column */}
-            <div className="md:col-span-9 space-y-24">
-              {filteredPosts.map((post, index) => (
-                <article key={post.id} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center group">
-                  <div className={`${index % 2 === 1 ? 'order-2 md:order-1' : ''} relative overflow-hidden aspect-[4/5] bg-surface-dim`}>
-                    <img 
-                      src={post.coverImage} 
-                      alt={post.title}
-                      className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                    <div className="absolute inset-0 dimmed-overlay"></div>
+            <div className="md:col-span-9">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {paginatedPosts.map((post, index) => (
+                  <article 
+                    key={post.id} 
+                    className={`group cursor-pointer ${post.isFeatured ? 'md:col-span-2' : ''}`}
+                  >
+                    <div className="bg-surface-container-low rounded-xl overflow-hidden whisper-shadow hover:shadow-lg transition-shadow duration-300">
+                      <div className={`relative overflow-hidden bg-surface-dim ${post.isFeatured ? 'aspect-[21/9]' : 'aspect-[4/5]'}`}>
+                        <img 
+                          src={post.coverImage} 
+                          alt={post.title}
+                          className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                        <div className="absolute inset-0 dimmed-overlay" />
+                        {post.editorialTag && (
+                          <span className="absolute top-4 left-4 px-3 py-1 bg-primary/90 text-on-primary text-[10px] font-medium uppercase tracking-widest rounded">
+                            {post.editorialTag}
+                          </span>
+                        )}
+                        {post.isFeatured && (
+                          <span className="absolute top-4 right-4 px-3 py-1 bg-secondary/90 text-on-secondary text-[10px] font-medium uppercase tracking-widest rounded">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className={`p-6 ${post.isFeatured ? 'md:p-8' : ''}`}>
+                        <span className="label-text text-[10px] text-primary uppercase tracking-[0.3em] mb-3 block">
+                          {post.seriesId ? `Volume ${post.seriesOrder} • ` : ''}{post.date}
+                        </span>
+                        <h4 className={`font-headline font-bold mb-3 leading-tight group-hover:text-primary transition-colors ${post.isFeatured ? 'text-3xl' : 'text-xl'}`}>
+                          {post.title}
+                        </h4>
+                        <p className={`text-on-surface-variant leading-relaxed italic mb-4 ${post.isFeatured ? 'text-lg' : 'text-sm'}`}>
+                          {post.excerpt}
+                        </p>
+                        <Link 
+                          to={`/read/${post.id}`}
+                          className="label-text text-xs uppercase font-semibold tracking-widest border-b border-outline-variant/50 w-fit pb-1 hover:border-primary transition-colors"
+                        >
+                          Read {post.seriesId ? 'Volume' : 'Reflection'}
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 mt-12">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg bg-surface-container text-on-surface disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container-high transition-colors"
+                  >
+                    <span className="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? 'bg-primary text-on-primary'
+                            : 'bg-surface-container text-on-surface hover:bg-surface-container-high'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
                   </div>
                   
-                  <div className={`${index % 2 === 1 ? 'order-1 md:order-2 text-right md:text-left' : ''} flex flex-col justify-center`}>
-                    <span className="label-text text-[10px] text-primary uppercase tracking-[0.3em] mb-4">
-                      Post No. {String(post.postNumber).padStart(3, '0')} • {post.date}
-                    </span>
-                    <h4 className="font-headline text-2xl font-bold mb-4 leading-tight group-hover:text-primary transition-colors cursor-pointer">
-                      {post.title}
-                    </h4>
-                    <p className="text-on-surface-variant leading-relaxed text-lg italic mb-6">
-                      {post.excerpt}
-                    </p>
-                    <Link 
-                      to={`/read/${post.id}`}
-                      className={`label-text text-xs uppercase font-semibold tracking-widest border-b border-outline-variant/50 w-fit pb-1 hover:border-primary transition-colors ${
-                        index % 2 === 1 ? 'ml-auto md:ml-0' : ''
-                      }`}
-                    >
-                      Read Reflection
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg bg-surface-container text-on-surface disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container-high transition-colors"
+                  >
+                    <span className="material-symbols-outlined">chevron_right</span>
+                  </button>
+                </div>
+              )}
 
               {/* Pull Quote Accent */}
               <div className="py-12 border-l-2 border-secondary pl-8 my-12">

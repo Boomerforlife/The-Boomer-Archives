@@ -4,11 +4,19 @@ import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import MobileBottomNav from '../components/layout/MobileBottomNav';
 import Footer from '../components/layout/Footer';
-import { mockPosts, mockComments } from '../data/mockData';
+import { mockPosts, mockComments, mockSeries } from '../data/mockData';
 
 const ArticlePage = () => {
   const { id } = useParams();
   const post = mockPosts.find(p => p.id === id) || mockPosts[0];
+
+  // Get series info if post belongs to a series
+  const currentSeries = post.seriesId ? mockSeries.find(s => s.id === post.seriesId) : null;
+  const seriesPosts = currentSeries 
+    ? mockPosts.filter(p => p.seriesId === post.seriesId).sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0))
+    : [];
+  const currentIndex = seriesPosts.findIndex(p => p.id === post.id);
+  const nextPost = currentIndex >= 0 && currentIndex < seriesPosts.length - 1 ? seriesPosts[currentIndex + 1] : null;
 
   return (
     <div className="min-h-screen bg-surface-container-high">
@@ -94,6 +102,30 @@ const ArticlePage = () => {
             </div>
           </div>
         </article>
+
+        {/* Series Navigation - Next Volume */}
+        {nextPost && (
+          <section className="max-w-3xl mx-auto mt-16">
+            <div className="bg-surface-container-low rounded-xl p-8 border border-outline-variant/10">
+              <span className="text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant mb-2 block">
+                {currentSeries?.title} • Volume {nextPost.seriesOrder}
+              </span>
+              <h3 className="text-2xl font-headline italic font-bold text-on-surface mb-4">
+                {nextPost.title}
+              </h3>
+              <p className="text-on-surface-variant text-sm mb-6 line-clamp-2">
+                {nextPost.excerpt}
+              </p>
+              <Link 
+                to={`/read/${nextPost.id}`}
+                className="inline-flex items-center gap-2 bg-primary text-on-primary py-3 px-6 rounded-full text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all"
+              >
+                Read Next
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Comments Section */}
         <section className="max-w-3xl mx-auto mt-20">
