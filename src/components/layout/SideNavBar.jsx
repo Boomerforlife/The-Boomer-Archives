@@ -90,13 +90,15 @@ const SideNavBar = () => {
             <Link
               key={item.label}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-200 ease-in-out ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ease-out group ${
                 isActive(item.path)
                   ? 'text-on-surface font-bold bg-surface-container-high'
-                  : 'text-on-surface-variant hover:bg-surface-variant'
+                  : 'text-on-surface-variant hover:bg-surface-variant hover:translate-x-1'
               }`}
             >
-              <span className="material-symbols-outlined">{item.icon}</span>
+              <span className={`material-symbols-outlined transition-transform duration-300 ${
+                isActive(item.path) ? '' : 'group-hover:scale-110'
+              }`}>{item.icon}</span>
               <span className="text-xs font-medium uppercase tracking-widest label-text">
                 {item.label}
               </span>
@@ -106,7 +108,7 @@ const SideNavBar = () => {
         
         <Link
           to="/press-room"
-          className="mt-auto bg-primary text-on-primary py-3 px-4 rounded-md text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all text-center"
+          className="mt-auto bg-primary text-on-primary py-3 px-4 rounded-md text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
         >
           New Entry
         </Link>
