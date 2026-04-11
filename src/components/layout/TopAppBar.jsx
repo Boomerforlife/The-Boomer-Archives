@@ -18,33 +18,42 @@ const TopAppBar = ({ visible = true }) => {
         <nav className="hidden md:flex items-center gap-8">
           <Link 
             to="/archive" 
-            className={`text-sm font-sans transition-colors duration-300 ${
+            className={`relative text-sm font-sans transition-all duration-300 group ${
               isActive('/archive') 
-                ? 'text-on-surface border-b border-primary pb-1' 
+                ? 'text-on-surface' 
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             Archive
+            <span className={`absolute bottom-0 left-0 h-[1px] bg-primary transition-all duration-300 ${
+              isActive('/archive') ? 'w-full' : 'w-0 group-hover:w-full'
+            }`} />
           </Link>
           <Link 
             to="/member" 
-            className={`text-sm font-sans transition-colors duration-300 ${
+            className={`relative text-sm font-sans transition-all duration-300 group ${
               isActive('/member') 
-                ? 'text-on-surface border-b border-primary pb-1' 
+                ? 'text-on-surface' 
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             Library
+            <span className={`absolute bottom-0 left-0 h-[1px] bg-primary transition-all duration-300 ${
+              isActive('/member') ? 'w-full' : 'w-0 group-hover:w-full'
+            }`} />
           </Link>
           <Link 
             to="/press-room" 
-            className={`text-sm font-sans transition-colors duration-300 ${
+            className={`relative text-sm font-sans transition-all duration-300 group ${
               isActive('/press-room') 
-                ? 'text-on-surface border-b border-primary pb-1' 
+                ? 'text-on-surface' 
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             Press Room
+            <span className={`absolute bottom-0 left-0 h-[1px] bg-primary transition-all duration-300 ${
+              isActive('/press-room') ? 'w-full' : 'w-0 group-hover:w-full'
+            }`} />
           </Link>
         </nav>
         

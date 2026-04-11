@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
@@ -9,6 +9,8 @@ import { mockPosts } from '../data/mockData';
 const ArchivePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCards, setVisibleCards] = useState(new Set());
+  const cardRefs = useRef([]);
   const postsPerPage = 6;
 
   const categories = ['Manuscripts', 'Textiles', 'Industrial', 'Ephemeral'];
@@ -28,6 +30,30 @@ const ArchivePage = () => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = entry.target.dataset.index;
+          if (index) {
+            setVisibleCards(prev => new Set([...prev, parseInt(index)]));
+          }
+        }
+      });
+    }, observerOptions);
+
+    cardRefs.current.forEach(ref => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [paginatedPosts]);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -75,7 +101,14 @@ const ArchivePage = () => {
                 {paginatedPosts.map((post, index) => (
                   <article 
                     key={post.id} 
-                    className={`group cursor-pointer ${post.isFeatured ? 'md:col-span-2' : ''}`}
+                    ref={el => cardRefs.current[index] = el}
+                    data-index={index}
+                    className={`group transition-all duration-700 ease-out ${
+                      visibleCards.has(index) 
+                        ? 'opacity-100 translate-y-0' 
+                        : 'opacity-0 translate-y-12'
+                    }`}
+                    style={{ transitionDelay: `${(index % 3) * 100}ms` }}
                   >
                     <div className="bg-surface-container-low rounded-xl overflow-hidden whisper-shadow hover:shadow-lg transition-shadow duration-300">
                       <div className={`relative overflow-hidden bg-surface-dim ${post.isFeatured ? 'aspect-[21/9]' : 'aspect-[4/5]'}`}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
@@ -7,6 +7,10 @@ import Footer from '../components/layout/Footer';
 import { mockPosts } from '../data/mockData';
 
 const LandingPage = () => {
+  const [heroVisible, setHeroVisible] = React.useState(true);
+  const [visibleCards, setVisibleCards] = useState(new Set());
+  const heroRef = React.useRef(null);
+  const cardRefs = useRef([]);
   const vantaRef = useRef(null);
   const [showTopBar, setShowTopBar] = useState(false);
 
@@ -16,7 +20,31 @@ const LandingPage = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = entry.target.dataset.index;
+          if (index) {
+            setVisibleCards(prev => new Set([...prev, parseInt(index)]));
+          }
+        }
+      });
+    }, observerOptions);
+
+    cardRefs.current.forEach(ref => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -72,7 +100,16 @@ const LandingPage = () => {
           {/* Featured Cards */}
           <div className="space-y-12">
             {featuredPosts.map((post, index) => (
-              <article key={post.id} className="group cursor-pointer card-hover-preview">
+              <article 
+                key={post.id} 
+                ref={el => cardRefs.current[index] = el}
+                data-index={index}
+                className={`group cursor-pointer card-hover-preview transition-all duration-700 ease-out ${
+                  visibleCards.has(index) 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-12'
+                }`}
+              >
                 <div className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} bg-surface-container-low rounded-xl overflow-hidden whisper-shadow min-h-[400px]`}>
                   <div className="md:w-3/5 overflow-hidden">
                     <img 
