@@ -5,6 +5,8 @@ import ArchivePage from './pages/ArchivePage';
 import ArticlePage from './pages/ArticlePage';
 import PressRoom from './pages/PressRoom';
 import MemberPage from './pages/MemberPage';
+import LegalBlooper from './pages/LegalBlooper';
+import ColophonBlooper from './pages/ColophonBlooper';
 import LoadingScreen from './components/common/LoadingScreen';
 
 // Wrapper to handle loading on route changes
@@ -41,6 +43,8 @@ function AppContent() {
           <Route path="/read/:id" element={<ArticlePage />} />
           <Route path="/press-room" element={<PressRoom />} />
           <Route path="/member" element={<MemberPage />} />
+          <Route path="/legal" element={<LegalBlooper />} />
+          <Route path="/colophon" element={<ColophonBlooper />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
