@@ -26,7 +26,7 @@ const ColophonBlooper = () => {
           <div className="prose prose-lg max-w-none">
             <div className="bg-[#CEC1AB]/20 rounded-xl p-8 border border-outline-variant/10">
               <p className="text-on-surface-variant text-center italic">
-                Just wanted a place where i can express my different personalities and thoughts 
+                Just wanted a place where i can express my different Personalities and Thoughts. 
               </p>
             </div>
           </div>
