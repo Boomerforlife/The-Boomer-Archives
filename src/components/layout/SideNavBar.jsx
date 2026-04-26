@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import TransitionLink from '../common/TransitionLink';
 
 const SideNavBar = () => {
   const location = useLocation();
@@ -87,7 +88,7 @@ const SideNavBar = () => {
         
         <nav className="flex flex-col gap-2 flex-grow">
           {navItems.map((item) => (
-            <Link
+            <TransitionLink
               key={item.label}
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ease-out group ${
@@ -102,16 +103,16 @@ const SideNavBar = () => {
               <span className="text-xs font-medium uppercase tracking-widest label-text">
                 {item.label}
               </span>
-            </Link>
+            </TransitionLink>
           ))}
         </nav>
         
-        <Link
+        <TransitionLink
           to="/press-room"
           className="mt-auto bg-primary text-on-primary py-3 px-4 rounded-md text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
         >
           New Entry
-        </Link>
+        </TransitionLink>
       </aside>
     </>
   );

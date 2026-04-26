@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import TransitionLink from '../common/TransitionLink';
 
 const TopAppBar = ({ visible = true }) => {
   const location = useLocation();
   const [hoveredWord, setHoveredWord] = useState('Boomer');
   const [isHovering, setIsHovering] = useState(false);
-  const names = ['Boomer', 'Vighnesh', 'Yash', 'Trigger'];
+  const names = ['Boomer', ' Vighnesh ', 'Yash', 'Trigger'];
   
   const isActive = (path) => location.pathname === path;
 
@@ -29,7 +30,7 @@ const TopAppBar = ({ visible = true }) => {
       visible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
-        <Link to="/" className="text-2xl font-serif font-bold text-on-surface tracking-tighter">
+        <TransitionLink to="/" className="text-2xl font-serif font-bold text-on-surface tracking-tighter">
           <span className="inline">The </span>
           <span 
             className="inline-block cursor-pointer transition-all duration-300 ease-in-out min-w-[100px] text-center"
@@ -50,10 +51,10 @@ const TopAppBar = ({ visible = true }) => {
             </span>
           </span>
           <span className="inline"> Archives</span>
-        </Link>
+        </TransitionLink>
         
         <nav className="hidden md:flex items-center gap-8">
-          <Link 
+          <TransitionLink 
             to="/archive" 
             className={`relative text-sm font-sans transition-all duration-300 group ${
               isActive('/archive') 
@@ -65,8 +66,8 @@ const TopAppBar = ({ visible = true }) => {
             <span className={`absolute bottom-0 left-0 h-[1px] bg-primary transition-all duration-300 ${
               isActive('/archive') ? 'w-full' : 'w-0 group-hover:w-full'
             }`} />
-          </Link>
-          <Link 
+          </TransitionLink>
+          <TransitionLink 
             to="/member" 
             className={`relative text-sm font-sans transition-all duration-300 group ${
               isActive('/member') 
@@ -78,8 +79,8 @@ const TopAppBar = ({ visible = true }) => {
             <span className={`absolute bottom-0 left-0 h-[1px] bg-primary transition-all duration-300 ${
               isActive('/member') ? 'w-full' : 'w-0 group-hover:w-full'
             }`} />
-          </Link>
-          <Link 
+          </TransitionLink>
+          <TransitionLink 
             to="/press-room" 
             className={`relative text-sm font-sans transition-all duration-300 group ${
               isActive('/press-room') 
@@ -91,7 +92,7 @@ const TopAppBar = ({ visible = true }) => {
             <span className={`absolute bottom-0 left-0 h-[1px] bg-primary transition-all duration-300 ${
               isActive('/press-room') ? 'w-full' : 'w-0 group-hover:w-full'
             }`} />
-          </Link>
+          </TransitionLink>
         </nav>
         
         <div></div>

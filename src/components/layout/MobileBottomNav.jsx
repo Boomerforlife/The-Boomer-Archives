@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import TransitionLink from '../common/TransitionLink';
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -8,21 +9,21 @@ const MobileBottomNav = () => {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 w-full bg-surface-variant/90 backdrop-blur-lg flex justify-around items-center py-4 z-50">
-      <Link to="/" className={`material-symbols-outlined ${isActive('/') ? 'text-primary' : 'text-on-surface-variant'}`}>
+      <TransitionLink to="/" className={`material-symbols-outlined ${isActive('/') ? 'text-primary' : 'text-on-surface-variant'}`}>
         home
-      </Link>
-      <Link to="/archive" className={`material-symbols-outlined ${isActive('/archive') ? 'text-primary font-bold' : 'text-on-surface-variant'}`} style={isActive('/archive') ? { fontVariationSettings: "'FILL' 1" } : {}}>
+      </TransitionLink>
+      <TransitionLink to="/archive" className={`material-symbols-outlined ${isActive('/archive') ? 'text-primary font-bold' : 'text-on-surface-variant'}`} style={isActive('/archive') ? { fontVariationSettings: "'FILL' 1" } : {}}>
         auto_stories
-      </Link>
-      <Link to="/press-room" className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+      </TransitionLink>
+      <TransitionLink to="/press-room" className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
         <span className="material-symbols-outlined">add</span>
-      </Link>
-      <Link to="/archive" className="material-symbols-outlined text-on-surface-variant">
+      </TransitionLink>
+      <TransitionLink to="/archive" className="material-symbols-outlined text-on-surface-variant">
         search
-      </Link>
-      <Link to="/member" className="material-symbols-outlined text-on-surface-variant">
+      </TransitionLink>
+      <TransitionLink to="/member" className="material-symbols-outlined text-on-surface-variant">
         person
-      </Link>
+      </TransitionLink>
     </nav>
   );
 };

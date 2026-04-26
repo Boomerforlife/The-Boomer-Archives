@@ -9,6 +9,8 @@ import LegalBlooper from './pages/LegalBlooper';
 import ColophonBlooper from './pages/ColophonBlooper';
 import LoadingScreen from './components/common/LoadingScreen';
 import TransitionOverlay from './components/common/TransitionOverlay';
+import { AuthProvider } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
 
 // Create context for page transition
 const PageTransitionContext = createContext(null);
@@ -95,7 +97,11 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <DataProvider>
+          <AppContent />
+        </DataProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

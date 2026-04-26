@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import TransitionLink from '../components/common/TransitionLink';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import MobileBottomNav from '../components/layout/MobileBottomNav';
 import Footer from '../components/layout/Footer';
-import { mockPosts } from '../data/mockData';
+import { useData } from '../contexts/DataContext';
 
 const LandingPage = () => {
+  const { posts, loading } = useData();
   const [heroVisible, setHeroVisible] = React.useState(true);
   const [visibleCards, setVisibleCards] = useState(new Set());
   const heroRef = React.useRef(null);
@@ -45,7 +46,7 @@ const LandingPage = () => {
       window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
-  }, []);
+  }, [posts]); // Re-run when posts change
 
   useEffect(() => {
     if (!vantaRef.current || !window.VANTA) return;
@@ -71,7 +72,7 @@ const LandingPage = () => {
     };
   }, []);
 
-  const featuredPosts = mockPosts.slice(0, 4);
+  const featuredPosts = posts.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -99,7 +100,7 @@ const LandingPage = () => {
           <div className="px-8 max-w-7xl mx-auto">
           {/* Featured Cards */}
           <div className="space-y-12">
-            {featuredPosts.map((post, index) => (
+            {!loading && featuredPosts.map((post, index) => (
               <article 
                 key={post.id} 
                 ref={el => cardRefs.current[index] = el}
@@ -128,12 +129,12 @@ const LandingPage = () => {
                     <p className="text-on-surface-variant leading-relaxed mb-8">
                       {post.excerpt}
                     </p>
-                    <Link 
+                    <TransitionLink 
                       to={`/read/${post.id}`}
                       className="self-start text-xs font-medium uppercase tracking-widest text-primary border-b border-primary/30 pb-1 hover:border-primary transition-colors"
                     >
                       Enter Entry
-                    </Link>
+                    </TransitionLink>
                   </div>
                 </div>
               </article>

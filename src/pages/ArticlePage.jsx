@@ -1,22 +1,92 @@
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import TransitionLink from '../components/common/TransitionLink';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import MobileBottomNav from '../components/layout/MobileBottomNav';
 import Footer from '../components/layout/Footer';
-import { mockPosts, mockComments, mockSeries } from '../data/mockData';
+import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
+import { getCommentsForPost, addComment, incrementHearts } from '../services/firestore';
 
 const ArticlePage = () => {
   const { id } = useParams();
-  const post = mockPosts.find(p => p.id === id) || mockPosts[0];
+  const { posts, series, loading } = useData();
+  const { currentUser, signInWithGoogle } = useAuth();
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [hasHearted, setHasHearted] = useState(false);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      const fetchedComments = await getCommentsForPost(id);
+      setComments(fetchedComments);
+    };
+    fetchComments();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  const post = posts.find(p => p.id === id);
+
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <p>Post not found.</p>
+      </div>
+    );
+  }
 
   // Get series info if post belongs to a series
-  const currentSeries = post.seriesId ? mockSeries.find(s => s.id === post.seriesId) : null;
+  const currentSeries = post.seriesId ? series.find(s => s.id === post.seriesId) : null;
   const seriesPosts = currentSeries 
-    ? mockPosts.filter(p => p.seriesId === post.seriesId).sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0))
+    ? posts.filter(p => p.seriesId === post.seriesId).sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0))
     : [];
   const currentIndex = seriesPosts.findIndex(p => p.id === post.id);
   const nextPost = currentIndex >= 0 && currentIndex < seriesPosts.length - 1 ? seriesPosts[currentIndex + 1] : null;
+
+  const handleHeart = async () => {
+    if (hasHearted) return;
+    await incrementHearts(id);
+    setHasHearted(true);
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim() || !currentUser) return;
+    setSubmitting(true);
+    
+    try {
+      const initials = currentUser.displayName 
+        ? currentUser.displayName.split(' ').map(n => n[0]).join('').toUpperCase()
+        : 'U';
+
+      const commentData = {
+        author: currentUser.displayName || 'Anonymous',
+        initials: initials,
+        content: newComment,
+        date: new Date().toLocaleDateString()
+      };
+      
+      await addComment(id, commentData);
+      setNewComment('');
+      // Refresh comments
+      const fetchedComments = await getCommentsForPost(id);
+      setComments(fetchedComments);
+    } catch (error) {
+      console.error("Error adding comment", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-surface-container-high">
@@ -38,20 +108,34 @@ const ArticlePage = () => {
           <div className="max-w-3xl mx-auto px-8 lg:px-12 py-16">
             {/* Metadata */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-10 h-10 rounded-full bg-surface-variant overflow-hidden">
-                <img 
-                  src={post.author.avatar} 
-                  alt={post.author.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              {post.author && (
+                <div className="w-10 h-10 rounded-full bg-surface-variant overflow-hidden">
+                  <img 
+                    src={post.author.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'} 
+                    alt={post.author.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
               <div>
                 <span className="block text-xs font-medium uppercase tracking-widest label-text text-secondary">
-                  {post.author.name}
+                  {post.author?.name || 'The Archivist'}
                 </span>
                 <span className="block text-xs font-sans text-outline">
                   {post.date} • {post.readTime} min read
                 </span>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <button 
+                  onClick={handleHeart}
+                  disabled={hasHearted}
+                  className={`flex items-center gap-1 ${hasHearted ? 'text-primary' : 'text-outline hover:text-primary transition-colors'}`}
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {hasHearted ? 'favorite' : 'favorite_border'}
+                  </span>
+                  <span className="text-sm font-sans">{post.hearts || 0}</span>
+                </button>
               </div>
             </div>
 
@@ -61,37 +145,25 @@ const ArticlePage = () => {
             </h1>
 
             {/* Body Content */}
-            <div className="prose-custom text-on-surface-variant">
-              <p className="first-letter:text-7xl first-letter:font-serif first-letter:float-left first-letter:mr-3 first-letter:mt-2 first-letter:text-primary">
+            <div className="prose-custom text-on-surface-variant 
+              [&>p:first-of-type]:first-letter:text-7xl 
+              [&>p:first-of-type]:first-letter:font-serif 
+              [&>p:first-of-type]:first-letter:float-left 
+              [&>p:first-of-type]:first-letter:mr-3 
+              [&>p:first-of-type]:first-letter:mt-2 
+              [&>p:first-of-type]:first-letter:text-primary
+              [&>blockquote]:my-12 [&>blockquote]:py-4 [&>blockquote]:pl-8 [&>blockquote]:border-l-2 [&>blockquote]:border-secondary [&>blockquote]:italic [&>blockquote]:text-2xl [&>blockquote]:font-headline [&>blockquote]:text-on-surface
+              [&>h2]:text-2xl [&>h2]:font-headline [&>h2]:font-semibold [&>h2]:text-on-surface [&>h2]:mt-12 [&>h2]:mb-6
+              space-y-6
+            ">
+              <ReactMarkdown>
                 {post.content}
-              </p>
-              
-              <p>
-                Consider the texture of heavy-stock vellum. It does not simply hold text; it frames it. The way light catches the slight irregularities of the fiber creates a depth that no high-resolution screen can replicate. This is the "dim mode" of physical existence—a low-contrast, high-focus environment where the mind can truly decompress.
-              </p>
-
-              {/* Pull Quote */}
-              <div className="my-12 py-4 pl-8 border-l-2 border-secondary italic">
-                <blockquote className="text-2xl font-headline text-on-surface">
-                  "A book is a physical anchor in a world that is drifting into the ether. It is the only place left where the clock doesn't tick."
-                </blockquote>
-              </div>
-
-              <p>
-                We find that the Archivist does not merely collect objects, but moments of stillness. When we turn a page, we are engaging in a rhythmic choreography that has remained unchanged for centuries. This tactile feedback loop—the sound of the flip, the scent of the binding, the weight in the hands—creates a mnemonic bridge, helping the brain encode the narrative more deeply than a scrolling thumb ever could.
-              </p>
-
-              <h2 className="text-2xl font-headline font-semibold text-on-surface mt-12 mb-6">
-                The Geometry of Concentration
-              </h2>
-              <p>
-                The margins of a book are as important as the text itself. They provide a sanctuary for the reader's eye, a buffer against the noise of the external world. In our digital spaces, we have cluttered these borders with notifications and navigation, forgetting that white space—or in our case, warm paper tones—is the oxygen of thought.
-              </p>
+              </ReactMarkdown>
             </div>
 
             {/* Interaction Tags */}
             <div className="mt-16 pt-8 border-t border-outline-variant/20 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
+              {post.tags && post.tags.map((tag) => (
                 <span 
                   key={tag}
                   className="px-3 py-1 bg-surface-container-low text-xs font-medium uppercase tracking-widest label-text text-secondary rounded"
@@ -116,13 +188,13 @@ const ArticlePage = () => {
               <p className="text-on-surface-variant text-sm mb-6 line-clamp-2">
                 {nextPost.excerpt}
               </p>
-              <Link 
+              <TransitionLink 
                 to={`/read/${nextPost.id}`}
                 className="inline-flex items-center gap-2 bg-primary text-on-primary py-3 px-6 rounded-full text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all"
               >
                 Read Next
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
+              </TransitionLink>
             </div>
           </section>
         )}
@@ -130,11 +202,11 @@ const ArticlePage = () => {
         {/* Comments Section */}
         <section className="max-w-3xl mx-auto mt-20">
           <h3 className="text-xl font-headline italic font-bold mb-8 text-on-surface">
-            Reflections ({mockComments.length})
+            Reflections ({comments.length})
           </h3>
           
           <div className="space-y-10">
-            {mockComments.map((comment) => (
+            {comments.map((comment) => (
               <div key={comment.id} className="flex gap-6">
                 <div className="w-10 h-10 rounded bg-secondary-container flex-shrink-0 flex items-center justify-center">
                   <span className="text-xs font-bold label-text text-on-secondary-container">
@@ -153,16 +225,40 @@ const ArticlePage = () => {
               </div>
             ))}
 
-            {/* Comment Input - Gated */}
+            {/* Comment Input */}
             <div className="mt-12 bg-surface-container-low p-8 rounded-lg border border-outline-variant/10">
-              <div className="text-center py-8">
-                <p className="text-on-surface-variant mb-4">
-                  Sign in to share your reflections
-                </p>
-                <button className="bg-primary text-on-primary py-3 px-8 rounded-md text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all">
-                  Sign in with Google
-                </button>
-              </div>
+              {!currentUser ? (
+                <div className="text-center py-8">
+                  <p className="text-on-surface-variant mb-4">
+                    Sign in to share your reflections
+                  </p>
+                  <button 
+                    onClick={signInWithGoogle}
+                    className="bg-primary text-on-primary py-3 px-8 rounded-md text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all"
+                  >
+                    Sign in with Google
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleCommentSubmit} className="flex flex-col">
+                  <p className="text-sm text-on-surface-variant mb-4">
+                    Posting as <strong>{currentUser.displayName}</strong>
+                  </p>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Share your reflections..."
+                    className="w-full bg-surface p-4 rounded border border-outline-variant/30 focus:ring-1 focus:ring-primary focus:outline-none min-h-[120px] mb-4 text-sm"
+                  ></textarea>
+                  <button 
+                    type="submit"
+                    disabled={submitting || !newComment.trim()}
+                    className="self-end bg-primary text-on-primary py-2 px-6 rounded-md text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all disabled:opacity-50"
+                  >
+                    {submitting ? 'Posting...' : 'Post Reflection'}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </section>
@@ -175,3 +271,4 @@ const ArticlePage = () => {
 };
 
 export default ArticlePage;
+
