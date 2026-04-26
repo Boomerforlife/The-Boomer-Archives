@@ -1,60 +1,103 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import Footer from '../components/layout/Footer';
 import CardDesigner from '../components/press/CardDesigner';
 import SeriesOrchestrator from '../components/press/SeriesOrchestrator';
-import { mockPosts, mockSeries } from '../data/mockData';
+import { useAuth } from '../contexts/AuthContext';
+import { useData } from '../contexts/DataContext';
+import { createPost, updatePost } from '../services/firestore';
 
 const PressRoom = () => {
-  const [title, setTitle] = useState('The Weight of Vellum');
-  const [content, setContent] = useState(`There is a particular resistance that vellum offers to the nib—a physical dialogue between animal hide and cold steel. In the digital archive, we often forget the haptic dimension of our thoughts.
+  const { isAdmin, currentUser } = useAuth();
+  const { allPosts, series, loading } = useData();
 
-To write is to carve. Even here, in this digital space designed to mimic the dimly lit study, the intention remains the same. We seek to pin down the ephemeral.
-
-Consider the way light falls across a textured surface. Our interface should reflect this. Not through artificial shadows, but through the careful layering of tones—a tobacco-stained background that allows the eye to rest where the mind wanders.`);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [activeTab, setActiveTab] = useState('write');
-  const [posts, setPosts] = useState(mockPosts);
-  const [series, setSeries] = useState(mockSeries);
+  
   const [currentPost, setCurrentPost] = useState({
-    id: 'draft-1',
-    title: 'The Weight of Vellum',
-    excerpt: 'An exploration of age, grain, and the stories told through the wear of fine leather.',
-    content: content,
+    id: 'new',
+    title: '',
+    excerpt: '',
+    content: '',
     coverImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800',
-    category: 'Material Study',
-    editorialTag: 'MATERIAL',
-    isFeatured: true,
+    category: 'Draft',
+    editorialTag: '',
+    isFeatured: false,
     seriesId: null,
-    seriesOrder: null
+    seriesOrder: null,
+    status: 'draft'
   });
 
-  const drafts = [
-    { title: 'The Weight of Vellum', modified: '2h ago' },
-    { title: 'Reflections on Copperplate', modified: 'yesterday' },
-    { title: 'Ink Chemistry & Permanence', modified: 'Oct 12, 2024' },
-  ];
+  const [saving, setSaving] = useState(false);
 
-  const wordCount = content.split(/\s+/).length;
-  const readTime = Math.ceil(wordCount / 200);
+  useEffect(() => {
+    // If we select an existing post, populate the editor
+    if (currentPost.id !== 'new') {
+      setTitle(currentPost.title || '');
+      setContent(currentPost.content || '');
+    }
+  }, [currentPost.id]);
+
+  if (!loading && (!currentUser || !isAdmin)) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (loading) {
+    return <div className="min-h-screen bg-surface flex items-center justify-center">Loading Press Room...</div>;
+  }
+
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const readTime = Math.ceil(wordCount / 200) || 1;
 
   const handleUpdatePost = (updatedPost) => {
     setCurrentPost(updatedPost);
   };
 
   const handleUpdateSeries = (newSeriesList) => {
-    setSeries(newSeriesList);
+    // Not fully implemented yet, but would call Firestore here
+    console.log("Updating series list", newSeriesList);
   };
 
   const handleAssignPost = (postId, seriesId, order) => {
-    setPosts(posts.map(p => 
-      p.id === postId 
-        ? { ...p, seriesId, seriesOrder: order }
-        : p
-    ));
-    if (currentPost.id === postId) {
-      setCurrentPost({ ...currentPost, seriesId, seriesOrder: order });
+    // Not fully implemented yet, but would update Firestore here
+    console.log("Assigning post", postId, seriesId, order);
+  };
+
+  const handleSave = async (status = 'draft') => {
+    setSaving(true);
+    try {
+      const postData = {
+        ...currentPost,
+        title,
+        content,
+        excerpt: currentPost.excerpt || content.substring(0, 100) + '...',
+        status,
+        readTime,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      };
+
+      if (currentPost.id === 'new') {
+        const docRef = await createPost({
+          ...postData,
+          author: {
+            name: currentUser.displayName,
+            avatar: currentUser.photoURL
+          }
+        });
+        setCurrentPost({ ...postData, id: docRef.id });
+      } else {
+        await updatePost(currentPost.id, postData);
+        setCurrentPost(postData);
+      }
+      alert(`Post ${status === 'published' ? 'published' : 'saved'} successfully!`);
+    } catch (error) {
+      console.error("Error saving post:", error);
+      alert("Failed to save post");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -72,17 +115,26 @@ Consider the way light falls across a textured surface. Our interface should ref
           <section className="w-full md:w-80 border-r border-outline-variant/10 bg-surface-container-low/50 backdrop-blur-sm p-6 overflow-y-auto hidden md:block">
             <div className="mb-8">
               <h2 className="text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant mb-4">
-                Recent Drafts
+                All Entries
               </h2>
+              <button 
+                onClick={() => setCurrentPost({ id: 'new', title: '', content: '', status: 'draft' })}
+                className="w-full text-left py-2 text-sm text-primary hover:underline mb-4"
+              >
+                + Create New Entry
+              </button>
               <ul className="space-y-4">
-                {drafts.map((draft, index) => (
-                  <li key={index}>
-                    <button className="group block text-left w-full">
-                      <span className="block text-sm font-headline italic text-on-surface group-hover:text-primary transition-colors">
-                        {draft.title}
+                {allPosts.map((post) => (
+                  <li key={post.id}>
+                    <button 
+                      onClick={() => setCurrentPost(post)}
+                      className="group block text-left w-full"
+                    >
+                      <span className="block text-sm font-headline italic text-on-surface group-hover:text-primary transition-colors truncate">
+                        {post.title || 'Untitled Draft'}
                       </span>
                       <span className="block text-[10px] font-medium uppercase tracking-tighter label-text text-on-surface-variant/60">
-                        Modified {draft.modified}
+                        {post.status} • {post.date || 'No Date'}
                       </span>
                     </button>
                   </li>
@@ -155,19 +207,29 @@ Consider the way light falls across a textured surface. Our interface should ref
                       link
                     </button>
                   </div>
-                  <button className="bg-on-surface text-surface px-6 py-2 rounded-full text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all">
-                    Publish
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleSave('draft')}
+                      disabled={saving}
+                      className="bg-surface-variant text-on-surface-variant px-6 py-2 rounded-full text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all"
+                    >
+                      {saving ? 'Saving...' : 'Save Draft'}
+                    </button>
+                    <button 
+                      onClick={() => handleSave('published')}
+                      disabled={saving}
+                      className="bg-on-surface text-surface px-6 py-2 rounded-full text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all"
+                    >
+                      {saving ? 'Publishing...' : 'Publish'}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Title Input */}
                 <input
                   type="text"
                   value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    setCurrentPost({ ...currentPost, title: e.target.value });
-                  }}
+                  onChange={(e) => setTitle(e.target.value)}
                   className="text-4xl md:text-5xl font-headline italic tracking-tight mb-8 text-on-surface bg-transparent border-none focus:ring-0 w-full placeholder:text-outline-variant"
                   placeholder="Enter title..."
                 />
@@ -175,10 +237,7 @@ Consider the way light falls across a textured surface. Our interface should ref
                 {/* Editor Canvas */}
                 <textarea
                   value={content}
-                  onChange={(e) => {
-                    setContent(e.target.value);
-                    setCurrentPost({ ...currentPost, content: e.target.value });
-                  }}
+                  onChange={(e) => setContent(e.target.value)}
                   className="writing-canvas w-full bg-transparent border-none focus:ring-0 focus:outline-none text-lg md:text-xl leading-relaxed text-secondary resize-none min-h-[400px]"
                   placeholder="Begin your entry..."
                 />
@@ -186,10 +245,7 @@ Consider the way light falls across a textured surface. Our interface should ref
                 {/* Post Meta */}
                 <div className="mt-20 pt-12 border-t border-outline-variant/20 flex flex-wrap gap-4 items-center">
                   <span className="px-3 py-1 bg-surface-container-high rounded text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant">
-                    Material Study
-                  </span>
-                  <span className="px-3 py-1 bg-surface-container-high rounded text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant">
-                    Haptics
+                    {currentPost.category || 'Draft'}
                   </span>
                   <div className="flex-1 text-right text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant/40">
                     Words: {wordCount} · Est. {readTime} min
@@ -216,23 +272,12 @@ Consider the way light falls across a textured surface. Our interface should ref
                         </div>
                         <div className="p-4">
                           {currentPost.editorialTag && (
-                            <span className="inline-block px-2 py-1 bg-primary/10 text-primary text-[10px] font-medium uppercase tracking-widest rounded mb-2">
-                              {currentPost.editorialTag}
-                            </span>
+                           <span className="inline-block px-2 py-1 bg-primary/10 text-primary text-[10px] font-medium uppercase tracking-widest rounded mb-2">
+                             {currentPost.editorialTag}
+                           </span>
                           )}
                           <h4 className="font-headline text-lg font-bold text-on-surface leading-tight">
-                            {currentPost.title}
-                          </h4>
-                        </div>
-                      </div>
-                      <div className="bg-surface-container-high rounded-xl overflow-hidden whisper-shadow">
-                        <div className="aspect-[4/3] overflow-hidden bg-surface-variant" />
-                        <div className="p-4">
-                          <span className="inline-block px-2 py-1 bg-surface-variant text-on-surface-variant text-[10px] font-medium uppercase tracking-widest rounded mb-2">
-                            EXAMPLE
-                          </span>
-                          <h4 className="font-headline text-lg font-bold text-on-surface-variant leading-tight">
-                            Another Post Title
+                            {currentPost.title || 'Untitled Post'}
                           </h4>
                         </div>
                       </div>
@@ -250,7 +295,7 @@ Consider the way light falls across a textured surface. Our interface should ref
                   Series Orchestrator
                 </h2>
                 <SeriesOrchestrator
-                  posts={posts}
+                  posts={allPosts}
                   series={series}
                   onUpdateSeries={handleUpdateSeries}
                   onAssignPost={handleAssignPost}

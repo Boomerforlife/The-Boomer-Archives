@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import TransitionLink from '../components/common/TransitionLink';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import MobileBottomNav from '../components/layout/MobileBottomNav';
 import Footer from '../components/layout/Footer';
-import { mockPosts } from '../data/mockData';
+import { useData } from '../contexts/DataContext';
 
 const ArchivePage = () => {
+  const { posts } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleCards, setVisibleCards] = useState(new Set());
@@ -15,7 +16,7 @@ const ArchivePage = () => {
 
   const categories = ['Manuscripts', 'Textiles', 'Industrial', 'Ephemeral'];
 
-  const filteredPosts = mockPosts.filter(post => {
+  const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
@@ -76,7 +77,7 @@ const ArchivePage = () => {
                   setCurrentPage(1); // Reset to page 1 on search
                 }}
                 className="w-full bg-surface-container-low border-none border-b border-outline-variant/30 py-6 pl-14 pr-6 focus:ring-0 focus:bg-surface-container-highest transition-all duration-300 font-serif text-xl placeholder:italic placeholder:text-outline/50"
-                placeholder="Search the tactile records..."
+                placeholder="Search through My Big Brain..."
               />
               <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary group-focus-within:w-full transition-all duration-500"></div>
             </div>
@@ -91,7 +92,7 @@ const ArchivePage = () => {
               </h3>
               <div className="w-12 h-0.5 bg-primary mb-6"></div>
               <p className="label-text text-xs text-outline leading-relaxed uppercase tracking-widest">
-                The Formative Years<br/>1890 — 1924
+                The Formative Years<br/>2020 — 2030
               </p>
             </div>
 
@@ -140,12 +141,12 @@ const ArchivePage = () => {
                         <p className={`text-on-surface-variant leading-relaxed italic mb-4 ${post.isFeatured ? 'text-lg' : 'text-sm'}`}>
                           {post.excerpt}
                         </p>
-                        <Link 
+                        <TransitionLink 
                           to={`/read/${post.id}`}
                           className="label-text text-xs uppercase font-semibold tracking-widest border-b border-outline-variant/50 w-fit pb-1 hover:border-primary transition-colors"
                         >
                           Read {post.seriesId ? 'Volume' : 'Reflection'}
-                        </Link>
+                        </TransitionLink>
                       </div>
                     </div>
                   </article>
@@ -192,7 +193,7 @@ const ArchivePage = () => {
               {/* Pull Quote Accent */}
               <div className="py-12 border-l-2 border-secondary pl-8 my-12">
                 <blockquote className="font-headline text-3xl italic text-on-secondary-container leading-snug">
-                  "The digital age has not killed the tactile; it has only made the feel of paper more sacred, a physical anchor in a shifting stream."
+                  "Comfort is just fear in disguise, for life has no rest. (ima still go out on the weekends though)"
                 </blockquote>
                 <cite className="label-text text-[10px] uppercase tracking-widest mt-4 block text-outline">
                   — The Archivist's Preface
@@ -207,7 +208,7 @@ const ArchivePage = () => {
               Next Epoch
             </span>
             <h3 className="font-headline text-6xl italic font-bold text-on-surface tracking-tighter opacity-30 hover:opacity-100 transition-opacity cursor-pointer">
-              Volume II: The Industrial Shift
+              Volume II: The Mind shift
             </h3>
           </div>
         </div>
