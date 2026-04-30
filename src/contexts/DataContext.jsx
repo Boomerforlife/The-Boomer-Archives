@@ -20,24 +20,17 @@ export const DataProvider = ({ children }) => {
     // 1. Subscribe to published posts
     const qPosts = query(
       collection(db, 'posts'),
-      where('status', '==', 'published')
+      where('status', '==', 'published'),
+      orderBy('createdAt', 'desc')
     );
 
     const unsubscribePosts = onSnapshot(qPosts, (snapshot) => {
       const postsData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      // Sort by seriesOrder if they belong to a series, otherwise by createdAt descending
-      postsData.sort((a, b) => {
-        if (a.seriesId && b.seriesId && a.seriesId === b.seriesId) {
-          return (a.seriesOrder || 0) - (b.seriesOrder || 0);
-        }
-        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-        return timeB - timeA;
-      });
-      console.log("Vault Data Received:", postsData);
       setPosts(postsData);
     }, (error) => {
-      console.error("Error fetching published posts:", error);
+      console.error("Firebase Error: The query requires an index.");
+      console.error("Please open this link in your browser to create the composite index:", error.message);
+      console.error(error);
     });
 
     // 2. Subscribe to all posts (for Admin / Press Room)
