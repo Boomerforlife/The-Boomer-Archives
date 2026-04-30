@@ -154,6 +154,7 @@ const ArticlePage = () => {
               [&>p:first-of-type]:first-letter:text-primary
               [&>blockquote]:my-12 [&>blockquote]:py-4 [&>blockquote]:pl-8 [&>blockquote]:border-l-2 [&>blockquote]:border-secondary [&>blockquote]:italic [&>blockquote]:text-2xl [&>blockquote]:font-headline [&>blockquote]:text-on-surface
               [&>h2]:text-2xl [&>h2]:font-headline [&>h2]:font-semibold [&>h2]:text-on-surface [&>h2]:mt-12 [&>h2]:mb-6
+              [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80
               space-y-6
             ">
               <ReactMarkdown>

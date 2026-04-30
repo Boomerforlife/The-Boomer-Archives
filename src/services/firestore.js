@@ -22,16 +22,11 @@ const COMMENTS_COLLECTION = 'comments';
 export const getPublicPosts = async () => {
   const q = query(
     collection(db, POSTS_COLLECTION),
-    where('status', '==', 'published')
+    where('status', '==', 'published'),
+    orderBy('createdAt', 'desc')
   );
   const snapshot = await getDocs(q);
-  const posts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-  // Sort descending by createdAt manually
-  return posts.sort((a, b) => {
-    const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-    const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-    return timeB - timeA;
-  });
+  return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
 export const getAllPosts = async () => {
@@ -111,16 +106,11 @@ export const createSeries = async (seriesData) => {
 export const getCommentsForPost = async (postId) => {
   const q = query(
     collection(db, COMMENTS_COLLECTION),
-    where('postId', '==', postId)
+    where('postId', '==', postId),
+    orderBy('createdAt', 'desc')
   );
   const snapshot = await getDocs(q);
-  const comments = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-  // Sort descending by createdAt manually
-  return comments.sort((a, b) => {
-    const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-    const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-    return timeB - timeA;
-  });
+  return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
 export const addComment = async (postId, commentData) => {
