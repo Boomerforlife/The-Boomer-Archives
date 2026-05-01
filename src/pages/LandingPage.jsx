@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import TransitionLink from '../components/common/TransitionLink';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
@@ -14,6 +15,30 @@ const LandingPage = () => {
   const cardRefs = useRef([]);
   const vantaRef = useRef(null);
   const [showTopBar, setShowTopBar] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showSentinel, setShowSentinel] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.showSentinelMessage) {
+      setShowSentinel(true);
+      setIsFadingOut(false);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (showSentinel) {
+      const timer = setTimeout(() => {
+        setIsFadingOut(true);
+        setTimeout(() => {
+          setShowSentinel(false);
+          navigate('/', { replace: true, state: {} });
+        }, 500);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSentinel, navigate]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,7 +75,7 @@ const LandingPage = () => {
 
   useEffect(() => {
     if (!vantaRef.current || !window.VANTA) return;
-    
+
     const effect = window.VANTA.FOG({
       el: vantaRef.current,
       mouseControls: true,
@@ -76,12 +101,23 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-surface">
+      {showSentinel && (
+        <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] transition-all duration-500 ease-out ${isFadingOut ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0 animate-in slide-in-from-bottom-8 fade-in'
+          }`}>
+          <div className="backdrop-blur-xl bg-surface/60 p-6 px-8 border border-[#d4af37]/40 shadow-2xl rounded-2xl flex items-center gap-4">
+            <span className="material-symbols-outlined text-[#d4af37]">lock</span>
+            <h1 className="text-xl md:text-2xl font-serif italic text-on-surface tracking-tight drop-shadow-sm">
+              That Place is only for the Archivist.
+            </h1>
+          </div>
+        </div>
+      )}
       <TopAppBar visible={showTopBar} />
       <SideNavBar />
-      
+
       <main className="pb-20">
         {/* Vanta.js Full-Screen Hero Section */}
-        <section 
+        <section
           ref={vantaRef}
           className="fixed inset-0 z-0 flex items-center justify-center overflow-hidden"
         >
@@ -98,48 +134,47 @@ const LandingPage = () => {
         {/* Content starts after full-screen hero */}
         <div className="relative z-10 mt-[100vh] bg-surface pt-20">
           <div className="px-8 max-w-7xl mx-auto">
-          {/* Featured Cards */}
-          <div className="space-y-12">
-            {!loading && featuredPosts.map((post, index) => (
-              <article 
-                key={post.id} 
-                ref={el => cardRefs.current[index] = el}
-                data-index={index}
-                className={`group cursor-pointer card-hover-preview transition-all duration-700 ease-out ${
-                  visibleCards.has(index) 
-                    ? 'opacity-100 translate-y-0' 
-                    : 'opacity-0 translate-y-12'
-                }`}
-              >
-                <div className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} bg-surface-container-low rounded-xl overflow-hidden whisper-shadow min-h-[400px]`}>
-                  <div className="md:w-3/5 overflow-hidden">
-                    <img 
-                      src={post.coverImage} 
-                      alt={post.title}
-                      className="preview-image w-full h-full object-cover transition-all duration-700 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-90"
-                    />
+            {/* Featured Cards */}
+            <div className="space-y-12">
+              {!loading && featuredPosts.map((post, index) => (
+                <article
+                  key={post.id}
+                  ref={el => cardRefs.current[index] = el}
+                  data-index={index}
+                  className={`group cursor-pointer card-hover-preview transition-all duration-700 ease-out ${visibleCards.has(index)
+                      ? 'opacity-100 translate-y-0'
+                      : 'opacity-0 translate-y-12'
+                    }`}
+                >
+                  <div className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} bg-surface-container-low rounded-xl overflow-hidden whisper-shadow min-h-[400px]`}>
+                    <div className="md:w-3/5 overflow-hidden">
+                      <img
+                        src={post.coverImage}
+                        alt={post.title}
+                        className="preview-image w-full h-full object-cover transition-all duration-700 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-90"
+                      />
+                    </div>
+                    <div className="md:w-2/5 p-12 flex flex-col justify-center">
+                      <span className="text-xs font-medium uppercase tracking-widest label-text text-on-surface-variant mb-4">
+                        {post.category}
+                      </span>
+                      <h2 className="text-4xl font-serif text-on-surface mb-6 leading-tight">
+                        {post.title}
+                      </h2>
+                      <p className="text-on-surface-variant leading-relaxed mb-8">
+                        {post.excerpt}
+                      </p>
+                      <TransitionLink
+                        to={`/read/${post.id}`}
+                        className="self-start text-xs font-medium uppercase tracking-widest text-primary border-b border-primary/30 pb-1 hover:border-primary transition-colors"
+                      >
+                        View Entry →
+                      </TransitionLink>
+                    </div>
                   </div>
-                  <div className="md:w-2/5 p-12 flex flex-col justify-center">
-                    <span className="text-xs font-medium uppercase tracking-widest label-text text-on-surface-variant mb-4">
-                      {post.category}
-                    </span>
-                    <h2 className="text-4xl font-serif text-on-surface mb-6 leading-tight">
-                      {post.title}
-                    </h2>
-                    <p className="text-on-surface-variant leading-relaxed mb-8">
-                      {post.excerpt}
-                    </p>
-                    <TransitionLink 
-                      to={`/read/${post.id}`}
-                      className="self-start text-xs font-medium uppercase tracking-widest text-primary border-b border-primary/30 pb-1 hover:border-primary transition-colors"
-                    >
-                      Enter Entry
-                    </TransitionLink>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </main>

@@ -9,6 +9,10 @@ const CardDesigner = ({ post, onUpdate }) => {
     onUpdate({ ...post, editorialTag: e.target.value });
   };
 
+  const handleCategoryChange = (e) => {
+    onUpdate({ ...post, category: e.target.value });
+  };
+
   const handleCoverChange = (e) => {
     onUpdate({ ...post, coverImage: e.target.value });
   };
@@ -70,6 +74,18 @@ const CardDesigner = ({ post, onUpdate }) => {
           placeholder="Enter a brief description..."
           rows={3}
           className="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors resize-none"
+        />
+      </div>
+
+      {/* Category Input */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-on-surface">Category</label>
+        <input
+          type="text"
+          value={post.category || ''}
+          onChange={handleCategoryChange}
+          placeholder="e.g., Essay, Review, Journal"
+          className="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
         />
       </div>
 

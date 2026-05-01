@@ -6,6 +6,7 @@ import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import MobileBottomNav from '../components/layout/MobileBottomNav';
 import Footer from '../components/layout/Footer';
+import AuthModal from '../components/auth/AuthModal';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getCommentsForPost, addComment, incrementHearts } from '../services/firestore';
@@ -144,35 +145,41 @@ const ArticlePage = () => {
               {post.title}
             </h1>
 
-            {/* Body Content */}
-            <div className="prose-custom text-on-surface-variant 
-              [&>p:first-of-type]:first-letter:text-7xl 
-              [&>p:first-of-type]:first-letter:font-serif 
-              [&>p:first-of-type]:first-letter:float-left 
-              [&>p:first-of-type]:first-letter:mr-3 
-              [&>p:first-of-type]:first-letter:mt-2 
-              [&>p:first-of-type]:first-letter:text-primary
-              [&>blockquote]:my-12 [&>blockquote]:py-4 [&>blockquote]:pl-8 [&>blockquote]:border-l-2 [&>blockquote]:border-secondary [&>blockquote]:italic [&>blockquote]:text-2xl [&>blockquote]:font-headline [&>blockquote]:text-on-surface
-              [&>h2]:text-2xl [&>h2]:font-headline [&>h2]:font-semibold [&>h2]:text-on-surface [&>h2]:mt-12 [&>h2]:mb-6
-              [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80
-              space-y-6
-            ">
-              <ReactMarkdown>
-                {post.content}
-              </ReactMarkdown>
-            </div>
+            {!currentUser ? (
+              <AuthModal />
+            ) : (
+              <>
+                {/* Body Content */}
+                <div className="prose-custom text-on-surface-variant 
+                  [&>p:first-of-type]:first-letter:text-7xl 
+                  [&>p:first-of-type]:first-letter:font-serif 
+                  [&>p:first-of-type]:first-letter:float-left 
+                  [&>p:first-of-type]:first-letter:mr-3 
+                  [&>p:first-of-type]:first-letter:mt-2 
+                  [&>p:first-of-type]:first-letter:text-primary
+                  [&>blockquote]:my-12 [&>blockquote]:py-4 [&>blockquote]:pl-8 [&>blockquote]:border-l-2 [&>blockquote]:border-secondary [&>blockquote]:italic [&>blockquote]:text-2xl [&>blockquote]:font-headline [&>blockquote]:text-on-surface
+                  [&>h2]:text-2xl [&>h2]:font-headline [&>h2]:font-semibold [&>h2]:text-on-surface [&>h2]:mt-12 [&>h2]:mb-6
+                  [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80
+                  space-y-6
+                ">
+                  <ReactMarkdown>
+                    {post.content}
+                  </ReactMarkdown>
+                </div>
 
-            {/* Interaction Tags */}
-            <div className="mt-16 pt-8 border-t border-outline-variant/20 flex flex-wrap gap-2">
-              {post.tags && post.tags.map((tag) => (
-                <span 
-                  key={tag}
-                  className="px-3 py-1 bg-surface-container-low text-xs font-medium uppercase tracking-widest label-text text-secondary rounded"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+                {/* Interaction Tags */}
+                <div className="mt-16 pt-8 border-t border-outline-variant/20 flex flex-wrap gap-2">
+                  {post.tags && post.tags.map((tag) => (
+                    <span 
+                      key={tag}
+                      className="px-3 py-1 bg-surface-container-low text-xs font-medium uppercase tracking-widest label-text text-secondary rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </article>
 

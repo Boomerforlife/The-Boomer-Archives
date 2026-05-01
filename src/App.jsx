@@ -9,6 +9,7 @@ import LegalBlooper from './pages/LegalBlooper';
 import ColophonBlooper from './pages/ColophonBlooper';
 import LoadingScreen from './components/common/LoadingScreen';
 import TransitionOverlay from './components/common/TransitionOverlay';
+import LoginPage from './pages/LoginPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 
@@ -84,6 +85,7 @@ function AppContent() {
             <Route path="/read/:id" element={<ArticlePage />} />
             <Route path="/press-room" element={<PressRoom />} />
             <Route path="/member" element={<MemberPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/legal" element={<LegalBlooper />} />
             <Route path="/colophon" element={<ColophonBlooper />} />
             <Route path="*" element={<Navigate to="/" />} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
 import Footer from '../components/layout/Footer';
@@ -41,13 +41,14 @@ const PressRoom = () => {
     }
   }, [currentPost.id]);
 
-  if (!loading && (!currentUser || !isAdmin)) {
-    return <Navigate to="/" replace />;
+  if (!loading && !isAdmin) {
+    return <Navigate to="/" state={{ showSentinelMessage: true }} replace />;
   }
 
   if (loading) {
     return <div className="min-h-screen bg-surface flex items-center justify-center">Loading Press Room...</div>;
   }
+
 
   const wordCount = content.split(/\s+/).filter(Boolean).length;
   const readTime = Math.ceil(wordCount / 200) || 1;
@@ -102,7 +103,7 @@ const PressRoom = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-surface relative">
       <TopAppBar />
       
       {/* Main Layout Shell */}
