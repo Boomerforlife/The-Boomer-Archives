@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 const MemberPage = () => {
   const { posts } = useData();
   const { currentUser, signInWithGoogle, isAdmin } = useAuth();
-  
+
   // Simulated reading journal data using the real posts
   const recentlyReadPosts = posts.slice(0, 2);
   const heartedPosts = [...posts].sort((a, b) => (b.hearts || 0) - (a.hearts || 0)).slice(0, 4);
@@ -19,14 +19,14 @@ const MemberPage = () => {
     <div className="min-h-screen bg-surface">
       <TopAppBar />
       <SideNavBar />
-      
+
       <main className="pt-24 pb-20">
         <div className="max-w-4xl mx-auto px-8 py-12">
           {/* Profile Header */}
           <div className="flex items-center gap-6 mb-12">
             <div className="w-20 h-20 rounded-full bg-surface-variant overflow-hidden">
-              <img 
-                src={currentUser?.photoURL || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200"} 
+              <img
+                src={currentUser?.photoURL || "https://i.pinimg.com/736x/d4/17/c5/d417c5ecee4000c998059d84398ddf03.jpg"}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -39,7 +39,7 @@ const MemberPage = () => {
                 Curating the tactile since {new Date().getFullYear()}
               </p>
               {!currentUser && (
-                <button 
+                <button
                   onClick={signInWithGoogle}
                   className="mt-3 text-sm font-bold text-primary hover:text-secondary transition-colors"
                 >
@@ -57,8 +57,8 @@ const MemberPage = () => {
             <div className="space-y-4">
               {recentlyReadPosts.map((post) => (
                 <div key={post.id} className="flex gap-4 p-4 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors">
-                  <img 
-                    src={post.coverImage} 
+                  <img
+                    src={post.coverImage}
                     alt={post.title}
                     className="w-24 h-24 object-cover rounded"
                   />
@@ -89,8 +89,8 @@ const MemberPage = () => {
               {heartedPosts.map((post) => (
                 <div key={post.id} className="group">
                   <div className="aspect-[4/3] overflow-hidden rounded-lg mb-3">
-                    <img 
-                      src={post.coverImage} 
+                    <img
+                      src={post.coverImage}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
