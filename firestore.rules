@@ -2,43 +2,39 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Check if the user is the Admin by comparing to a hardcoded UID
-    // Note: Replace 'YOUR_ADMIN_UID_HERE' with the actual UID of the admin user.
+
+    // Helper: Check if the requesting user is the Admin
     function isAdmin() {
       return request.auth != null && request.auth.uid == 'v77KWCs1rab7dQgNKOnA6M17nTP2';
     }
 
-    match /posts/{postId} {
-      // Public can read only published posts
-      allow read: if resource.data.status == 'published' || isAdmin();
-      
-      // Public can increment hearts, but nothing else
-      // Only the 'hearts' field can be changed by non-admins, and only incremented by 1
-      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hearts']) 
-                     && request.resource.data.hearts == resource.data.hearts + 1
-                     || isAdmin();
-
-      // Only admin can create or delete
-      allow create, delete: if isAdmin();
+    // Helper: Check if the requesting user is any authenticated member
+    function isMember() {
+      return request.auth != null;
     }
-    
+
+    match /posts/{postId} {
+      // Anyone can read published posts (Landing/Archive cards need this)
+      // Admin can read all posts including drafts
+      allow read: if resource.data.status == 'published' || isAdmin();
+
+      // Hearts: any visitor can increment by exactly 1 (anonymous engagement)
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hearts'])
+                     && request.resource.data.hearts == resource.data.hearts + 1;
+
+      // Admin-only: full write access (create, update all fields, delete)
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin();
+    }
+
     match /series/{seriesId} {
-      // Public can read all series
       allow read: if true;
-      
-      // Only admin can write
       allow write: if isAdmin();
     }
 
     match /comments/{commentId} {
-      // Public can read all comments
       allow read: if true;
-      
-      // Any authenticated user can create a comment
-      allow create: if request.auth != null;
-      
-      // Only admin can update or delete comments
+      allow create: if isMember();
       allow update, delete: if isAdmin();
     }
   }

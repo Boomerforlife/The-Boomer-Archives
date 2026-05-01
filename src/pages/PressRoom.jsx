@@ -58,13 +58,11 @@ const PressRoom = () => {
   };
 
   const handleUpdateSeries = (newSeriesList) => {
-    // Not fully implemented yet, but would call Firestore here
-    console.log("Updating series list", newSeriesList);
+    // TODO: Implement Firestore series update
   };
 
   const handleAssignPost = (postId, seriesId, order) => {
-    // Not fully implemented yet, but would update Firestore here
-    console.log("Assigning post", postId, seriesId, order);
+    // TODO: Implement Firestore post assignment
   };
 
   const handleSave = async (status = 'draft') => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import DOMPurify from 'dompurify';
 import TransitionLink from '../components/common/TransitionLink';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
@@ -163,7 +164,14 @@ const ArticlePage = () => {
                   space-y-6
                 ">
                   <ReactMarkdown>
-                    {post.content}
+                    {DOMPurify.sanitize(post.content || '', {
+                      ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
+                                      'ul', 'ol', 'li', 'a', 'strong', 'em', 'code', 'pre',
+                                      'br', 'hr', 'img'],
+                      ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class'],
+                      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'style'],
+                      FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover']
+                    })}
                   </ReactMarkdown>
                 </div>
 

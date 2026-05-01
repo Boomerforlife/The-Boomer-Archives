@@ -68,6 +68,18 @@ export const getPostById = async (id) => {
 
 export const createPost = async (postData) => {
   const { id, ...dataToSave } = postData; // Strip id if it exists
+
+  // Input validation
+  if (!dataToSave.title || typeof dataToSave.title !== 'string' || dataToSave.title.trim().length === 0) {
+    throw new Error('Post title is required and must be a non-empty string.');
+  }
+  if (dataToSave.content && typeof dataToSave.content !== 'string') {
+    throw new Error('Post content must be a string.');
+  }
+  if (dataToSave.status && !['draft', 'published'].includes(dataToSave.status)) {
+    throw new Error('Post status must be "draft" or "published".');
+  }
+
   const baseSlug = generateSlug(dataToSave.title || 'untitled');
   const slug = await getUniqueSlug(POSTS_COLLECTION, baseSlug);
   

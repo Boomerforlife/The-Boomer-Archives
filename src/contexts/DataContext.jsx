@@ -28,9 +28,7 @@ export const DataProvider = ({ children }) => {
       const postsData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       setPosts(postsData);
     }, (error) => {
-      console.error("Firebase Error: The query requires an index.");
-      console.error("Please open this link in your browser to create the composite index:", error.message);
-      console.error(error);
+      console.error("Firestore index error:", error.message);
     });
 
     // 2. Subscribe to all posts (for Admin / Press Room)
