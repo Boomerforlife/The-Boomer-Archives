@@ -282,5 +282,4 @@ Express yourself. Or don't. I'm a README, not a cop.
 <p align="center">
   <i>"Expressing Personalities One at a Time"</i>
 </p>
- 
- 
+
