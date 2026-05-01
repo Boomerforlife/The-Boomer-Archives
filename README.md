@@ -1,4 +1,4 @@
-# The Boomer Archives 📜
+# The Boomer Archives 
 
 > *"Comfort is just fear in disguise, for life has no rest. (ima still go out on the weekends though)"*  
 > — The Archivist's Preface
@@ -15,7 +15,7 @@ Welcome to **The Boomer Archives** — a digital sanctuary where thoughts, perso
 
 ## What Even Is This? 🤔
 
-Remember that scene in every adventure game where you find an ancient library with floating dust particles and mysterious fog? Yeah, we made that **but it's a blog**.
+Remember that scene in every Adventure Time where you find an ancient library with floating dust particles and mysterious fog? Yeah, we made that **but it's a blog**.
 
 - 🏛️ **Archive System** — Organized like an actual library because chaos is for *other* people
 - 🎭 **Multiple Personalities** — Expressing different vibes, one post at a time
@@ -196,7 +196,7 @@ We're using a custom Material Design 3 color palette that can only be described 
 
 ---
 
-## The Easter Eggs 🥚
+## The Easter Eggs (for those who were unable to find them) 🥚
 
 1. **The Sentinel** — Try accessing `/press-room` without being the admin. Watch what happens.
 
@@ -210,15 +210,15 @@ We're using a custom Material Design 3 color palette that can only be described 
 
 ---
 
-## Deployment 🌐
+## How I Deployed it 🌐
 
 ### Netlify (Recommended)
-1. Push to GitHub
-2. Connect repo to Netlify
-3. Build command: `npm run build`
-4. Publish directory: `build`
-5. Add environment variables in Netlify settings
-6. Deploy and pray
+1. Pushed to GitHub
+2. Connected repo to Netlify
+3. Built command: `npm run build`
+4. Published directory: `build`
+5. Added environment variables in Netlify settings
+6. Deployed and pray
 
 ---
 
@@ -242,7 +242,7 @@ Found a bug? Want to add a feature? Think the beige is too beige?
 3. Fix it
 4. PR it
 
-All contributions welcome. This is a learning project, so we're all figuring it out together.
+All contributions welcome. This is a learning project, so am still figuring it out together.
 
 ---
 
@@ -259,8 +259,6 @@ All contributions welcome. This is a learning project, so we're all figuring it 
 ## The Archivist 👤
 
 **Vighnesh Singh Dhanai** (aka Boomer)
-
-> RA2411026010352
 
 *Curating the tactile since 2026.*
 
@@ -282,9 +280,7 @@ Express yourself. Or don't. I'm a README, not a cop.
 ---
 
 <p align="center">
-  <i>Expressing Personalities One at a Time™</i>
+  <i>"Expressing Personalities One at a Time"</i>
 </p>
-
-<p align="center">
-  🏛️ 📜 ☕ 🎭 📚
-</p>
+ 
+ 
