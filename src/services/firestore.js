@@ -4,7 +4,7 @@ import {
   doc, 
   getDocs, 
   getDoc, 
-  addDoc, 
+  setDoc,
   updateDoc, 
   deleteDoc, 
   query, 
@@ -17,6 +17,25 @@ import {
 const POSTS_COLLECTION = 'posts';
 const SERIES_COLLECTION = 'series';
 const COMMENTS_COLLECTION = 'comments';
+
+export const generateSlug = (title) => {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+};
+
+const getUniqueSlug = async (collectionName, baseSlug) => {
+  let slug = baseSlug;
+  let docRef = doc(db, collectionName, slug);
+  let docSnap = await getDoc(docRef);
+  
+  if (docSnap.exists()) {
+    const randomStr = Math.random().toString(36).substring(2, 5);
+    slug = `${baseSlug}-${randomStr}`;
+  }
+  return slug;
+};
 
 // --- Posts ---
 export const getPublicPosts = async () => {
@@ -49,13 +68,18 @@ export const getPostById = async (id) => {
 
 export const createPost = async (postData) => {
   const { id, ...dataToSave } = postData; // Strip id if it exists
-  return await addDoc(collection(db, POSTS_COLLECTION), {
+  const baseSlug = generateSlug(dataToSave.title || 'untitled');
+  const slug = await getUniqueSlug(POSTS_COLLECTION, baseSlug);
+  
+  const docRef = doc(db, POSTS_COLLECTION, slug);
+  await setDoc(docRef, {
     ...dataToSave,
     createdAt: serverTimestamp(),
     publishedAt: dataToSave.status === 'published' ? serverTimestamp() : null,
     updatedAt: serverTimestamp(),
     hearts: 0
   });
+  return docRef;
 };
 
 export const updatePost = async (id, postData) => {
@@ -95,11 +119,16 @@ export const getAllSeries = async () => {
 
 export const createSeries = async (seriesData) => {
   const { id, ...dataToSave } = seriesData;
-  return await addDoc(collection(db, SERIES_COLLECTION), {
+  const baseSlug = generateSlug(dataToSave.title || 'untitled-series');
+  const slug = await getUniqueSlug(SERIES_COLLECTION, baseSlug);
+  
+  const docRef = doc(db, SERIES_COLLECTION, slug);
+  await setDoc(docRef, {
     ...dataToSave,
     createdAt: serverTimestamp(),
     postCount: 0
   });
+  return docRef;
 };
 
 // --- Comments ---
@@ -115,9 +144,11 @@ export const getCommentsForPost = async (postId) => {
 
 export const addComment = async (postId, commentData) => {
   const { id, ...dataToSave } = commentData;
-  return await addDoc(collection(db, COMMENTS_COLLECTION), {
+  const docRef = doc(collection(db, COMMENTS_COLLECTION));
+  await setDoc(docRef, {
     ...dataToSave,
     postId,
     createdAt: serverTimestamp()
   });
+  return docRef;
 };
