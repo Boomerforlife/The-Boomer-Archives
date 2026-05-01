@@ -52,7 +52,7 @@ Remember that scene in every Adventure Time where you find an ancient library wi
 - **Categories**: Manuscripts, Textiles, Industrial, Ephemeral (very pretentious)
 - **Asymmetric Layout**: Because symmetry is for cowards
 
-### 🖊️ The Press Room (Admin Only!)
+###  The Press Room (Admin Only!)
 > ⚠️ Try to access this without permission and The Sentinel will find you.
 
 - Card Designer for customizing post aesthetics
@@ -80,7 +80,7 @@ This isn't just a blog. It's a:
 
 ---
 
-## Getting Started 🚀
+## Getting Started 
 
 ### Prerequisites
 - Node.js (the newer the better)
@@ -110,7 +110,7 @@ The app will open at `http://localhost:3000` and the fog will begin.
 
 ---
 
-## 🔐 Firebase Setup (The "Fun" Part)
+## Firebase Setup (The "Fun" Part)
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Create a project (name it something mysterious)
@@ -177,7 +177,7 @@ src/
 
 ---
 
-## 🎨 The Aesthetic Explained
+## The Aesthetic Explained
 
 We're using a custom Material Design 3 color palette that can only be described as:
 
@@ -222,9 +222,8 @@ We're using a custom Material Design 3 color palette that can only be described 
 
 ---
 
-## Future Roadmap (The Wishlist) 🗺️
+## Future Roadmap (The Wishlist) 
 
-- [ ] Comment system (for validation)
 - [ ] Rich text editor with markdown (because plain text is *boring*)
 - [ ] Image uploads (so I can post memes directly)
 - [ ] Dark mode (for 3am writing sessions)
@@ -233,7 +232,7 @@ We're using a custom Material Design 3 color palette that can only be described 
 
 ---
 
-## Contributing 🤝
+## Contributing 
 
 Found a bug? Want to add a feature? Think the beige is too beige?
 
@@ -256,7 +255,7 @@ All contributions welcome. This is a learning project, so am still figuring it o
 
 ---
 
-## The Archivist 👤
+## The Archivist 
 
 **Vighnesh Singh Dhanai** (aka Boomer)
 
@@ -264,7 +263,7 @@ All contributions welcome. This is a learning project, so am still figuring it o
 
 ---
 
-## Final Words of Wisdom 📝
+## Final Words of Wisdom 
 
 ```
 If you're reading this:
