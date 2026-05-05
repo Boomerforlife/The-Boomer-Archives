@@ -222,7 +222,7 @@ Am using a custom Material Design 3 color palette that can only be described as:
 
 ---
 
-## Future Roadmap (The Wishlist) 🗺️
+## Future Roadmap (The Wishlist) 
 
 - [ ] Email (I allow who can read and who can not, member will be sent an automatic email)
 - [ ] Email automation (for notifications and updates)
@@ -257,7 +257,7 @@ All contributions welcome. This is a learning project, so am still figuring it o
 
 ---
 
-## The Archivist 👤
+## The Archivist 
 
 **Vighnesh Singh Dhanai** (aka Boomer)
 
@@ -265,7 +265,7 @@ All contributions welcome. This is a learning project, so am still figuring it o
 
 ---
 
-## Final Words of Wisdom 📝
+## Final Words of Wisdom 
 
 ```
 If you're reading this:
