@@ -5,6 +5,48 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --color-surface: 255 248 243;
+    --color-background: 255 248 243;
+    --color-on-surface: 34 26 14;
+    --color-surface-dim: 231 216 196;
+    --color-surface-container-lowest: 255 255 255;
+    --color-surface-container-low: 255 242 225;
+    --color-surface-container: 251 236 215;
+    --color-surface-container-high: 246 230 210;
+    --color-surface-container-highest: 240 224 204;
+    --color-surface-variant: 240 224 204;
+    --color-on-surface-variant: 76 70 62;
+    --color-primary: 102 93 84;
+    --color-on-primary: 255 255 255;
+    --color-secondary: 99 94 83;
+    --color-on-secondary: 255 255 255;
+    --color-outline: 125 118 109;
+    --color-outline-variant: 206 197 186;
+  }
+
+  .dark {
+    --color-surface: 26 20 11;
+    --color-background: 26 20 11;
+    --color-on-surface: 246 230 210;
+    --color-surface-dim: 33 25 16;
+    --color-surface-container-lowest: 20 15 8;
+    --color-surface-container-low: 44 38 32;
+    --color-surface-container: 51 44 37;
+    --color-surface-container-high: 56 48 40;
+    --color-surface-container-highest: 64 54 45;
+    --color-surface-variant: 44 38 32;
+    --color-on-surface-variant: 209 196 185; 
+    --color-primary: 163 150 132;
+    --color-on-primary: 26 20 11;
+    --color-secondary: 163 150 132;
+    --color-on-secondary: 26 20 11;
+    --color-outline: 163 150 132;
+    --color-outline-variant: 74 64 54;
+  }
+}
+
 html, body {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -17,8 +59,8 @@ body::-webkit-scrollbar {
 
 body {
   font-family: 'Newsreader', serif;
-  background-color: #fff8f3;
-  color: #221a0e;
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-on-surface));
 }
 
 .material-symbols-outlined {
@@ -31,21 +73,21 @@ body {
 }
 
 .glass-header {
-  background: rgba(240, 224, 204, 0.7);
-  backdrop-filter: blur(12px);
+  background-color: rgb(var(--color-surface-variant) / 0.7);
+  @apply backdrop-blur-md;
 }
 
 .whisper-shadow {
-  box-shadow: 0 10px 30px rgba(34, 26, 14, 0.06);
+  box-shadow: 0 10px 30px rgb(var(--color-on-surface) / 0.05);
 }
 
 .dimmed-overlay {
-  background-color: rgba(163, 150, 132, 0.15);
+  background-color: rgb(var(--color-primary) / 0.15);
 }
 
 .writing-canvas::selection {
-  background: #f0e0cc;
-  color: #221a0e;
+  background-color: rgb(var(--color-surface-variant));
+  color: rgb(var(--color-on-surface));
 }
 
 .editor-container {

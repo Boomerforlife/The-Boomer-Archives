@@ -112,6 +112,11 @@ export const deletePost = async (id) => {
   await deleteDoc(docRef);
 };
 
+export const assignPostToSeries = async (postId, seriesId, seriesOrder) => {
+  const docRef = doc(db, POSTS_COLLECTION, postId);
+  await updateDoc(docRef, { seriesId, seriesOrder });
+};
+
 export const incrementHearts = async (id) => {
   const docRef = doc(db, POSTS_COLLECTION, id);
   await updateDoc(docRef, {

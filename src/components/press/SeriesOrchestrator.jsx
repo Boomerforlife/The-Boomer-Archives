@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SeriesOrchestrator = ({ posts, series, onUpdateSeries, onAssignPost }) => {
+const SeriesOrchestrator = ({ posts, series, onCreateSeries, onAssignPost }) => {
   const [newSeriesTitle, setNewSeriesTitle] = useState('');
   const [newSeriesCover, setNewSeriesCover] = useState('');
   const [newSeriesDesc, setNewSeriesDesc] = useState('');
@@ -12,13 +12,12 @@ const SeriesOrchestrator = ({ posts, series, onUpdateSeries, onAssignPost }) => 
   const handleCreateSeries = () => {
     if (!newSeriesTitle) return;
     const newSeries = {
-      id: `series-${Date.now()}`,
       title: newSeriesTitle,
       coverUrl: newSeriesCover || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800',
       description: newSeriesDesc,
       postCount: 0
     };
-    onUpdateSeries([...series, newSeries]);
+    onCreateSeries(newSeries);
     setNewSeriesTitle('');
     setNewSeriesCover('');
     setNewSeriesDesc('');

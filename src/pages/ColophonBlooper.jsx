@@ -9,7 +9,7 @@ const ColophonBlooper = () => {
     <div className="min-h-screen bg-surface">
       <TopAppBar />
       <SideNavBar />
-      
+
       <main className="pt-24 pb-20">
         <div className="max-w-3xl mx-auto px-8 py-12">
           {/* Header */}
@@ -26,15 +26,15 @@ const ColophonBlooper = () => {
           <div className="prose prose-lg max-w-none">
             <div className="bg-[#CEC1AB]/20 rounded-xl p-8 border border-outline-variant/10">
               <p className="text-on-surface-variant text-center italic">
-                Just wanted a place where i can express my different Personalities and Thoughts. 
+                Just wanted a place where i can express my different Personalities and Thoughts.
               </p>
             </div>
           </div>
 
           {/* Back Link */}
           <div className="mt-12 text-center">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
             >
               <span className="material-symbols-outlined text-sm">arrow_back</span>

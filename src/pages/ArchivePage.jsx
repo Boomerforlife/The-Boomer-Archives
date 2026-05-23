@@ -7,8 +7,9 @@ import Footer from '../components/layout/Footer';
 import { useData } from '../contexts/DataContext';
 
 const ArchivePage = () => {
-  const { posts } = useData();
+  const { posts, series } = useData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSeries, setSelectedSeries] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleCards, setVisibleCards] = useState(new Set());
   const cardRefs = useRef([]);
@@ -19,7 +20,8 @@ const ArchivePage = () => {
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesSeries = selectedSeries ? post.seriesId === selectedSeries : true;
+    return matchesSearch && matchesSeries;
   });
 
   // Pagination logic
@@ -81,6 +83,41 @@ const ArchivePage = () => {
               />
               <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary group-focus-within:w-full transition-all duration-500"></div>
             </div>
+
+            {/* Series Filter */}
+            {series && series.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setSelectedSeries(null);
+                    setCurrentPage(1);
+                  }}
+                  className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest label-text transition-colors ${
+                    selectedSeries === null 
+                      ? 'bg-primary text-on-primary' 
+                      : 'bg-surface-container-high text-on-surface hover:bg-surface-variant'
+                  }`}
+                >
+                  All Entries
+                </button>
+                {series.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => {
+                      setSelectedSeries(s.id);
+                      setCurrentPage(1);
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest label-text transition-colors ${
+                      selectedSeries === s.id 
+                        ? 'bg-primary text-on-primary' 
+                        : 'bg-surface-container-high text-on-surface hover:bg-surface-variant'
+                    }`}
+                  >
+                    {s.title}
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Archive Content: Asymmetric Layout */}
@@ -111,7 +148,10 @@ const ArchivePage = () => {
                     }`}
                     style={{ transitionDelay: `${(index % 3) * 100}ms` }}
                   >
-                    <div className="bg-surface-container-low rounded-xl overflow-hidden whisper-shadow hover:shadow-lg transition-shadow duration-300">
+                    <TransitionLink 
+                      to={`/read/${post.id}`}
+                      className="block bg-surface-container-low rounded-xl overflow-hidden whisper-shadow hover:shadow-lg transition-shadow duration-300"
+                    >
                       <div className={`relative overflow-hidden bg-surface-dim ${post.isFeatured ? 'aspect-[21/9]' : 'aspect-[4/5]'}`}>
                         <img 
                           src={post.coverImage} 
@@ -141,14 +181,13 @@ const ArchivePage = () => {
                         <p className={`text-on-surface-variant leading-relaxed italic mb-4 ${post.isFeatured ? 'text-lg' : 'text-sm'}`}>
                           {post.excerpt}
                         </p>
-                        <TransitionLink 
-                          to={`/read/${post.id}`}
-                          className="label-text text-xs uppercase font-semibold tracking-widest border-b border-outline-variant/50 w-fit pb-1 hover:border-primary transition-colors"
+                        <span 
+                          className="label-text text-xs uppercase font-semibold tracking-widest border-b border-outline-variant/50 w-fit pb-1 group-hover:border-primary transition-colors block"
                         >
                           Read {post.seriesId ? 'Volume' : 'Reflection'}
-                        </TransitionLink>
+                        </span>
                       </div>
-                    </div>
+                    </TransitionLink>
                   </article>
                 ))}
               </div>

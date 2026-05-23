@@ -7,7 +7,7 @@ import CardDesigner from '../components/press/CardDesigner';
 import SeriesOrchestrator from '../components/press/SeriesOrchestrator';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
-import { createPost, updatePost } from '../services/firestore';
+import { createPost, updatePost, createSeries, assignPostToSeries } from '../services/firestore';
 
 const PressRoom = () => {
   const { isAdmin, currentUser } = useAuth();
@@ -57,12 +57,24 @@ const PressRoom = () => {
     setCurrentPost(updatedPost);
   };
 
-  const handleUpdateSeries = (newSeriesList) => {
-    // TODO: Implement Firestore series update
+  const handleCreateSeries = async (newSeriesData) => {
+    try {
+      await createSeries(newSeriesData);
+      alert('Series created successfully!');
+    } catch (error) {
+      console.error("Error creating series:", error);
+      alert('Failed to create series');
+    }
   };
 
-  const handleAssignPost = (postId, seriesId, order) => {
-    // TODO: Implement Firestore post assignment
+  const handleAssignPost = async (postId, seriesId, order) => {
+    try {
+      await assignPostToSeries(postId, seriesId, order);
+      alert('Post assigned to series successfully!');
+    } catch (error) {
+      console.error("Error assigning post:", error);
+      alert('Failed to assign post to series');
+    }
   };
 
   const handleSave = async (status = 'draft') => {
@@ -296,7 +308,7 @@ const PressRoom = () => {
                 <SeriesOrchestrator
                   posts={allPosts}
                   series={series}
-                  onUpdateSeries={handleUpdateSeries}
+                  onCreateSeries={handleCreateSeries}
                   onAssignPost={handleAssignPost}
                 />
               </div>
