@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../firebase/config';
+import { getSubscriberByEmail } from '../services/firestore';
 import { 
   onAuthStateChanged, 
   signInWithPopup, 
@@ -13,19 +14,36 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isApprovedMember, setIsApprovedMember] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // The UID of the Admin user
   const adminUid = process.env.REACT_APP_ADMIN_UID || '';
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+      
+      const isAdminUser = user && user.uid === adminUid;
+      if (isAdminUser) {
+        setIsApprovedMember(true);
+      } else if (user && user.email) {
+        try {
+          const subscriber = await getSubscriberByEmail(user.email);
+          setIsApprovedMember(subscriber?.status === 'approved');
+        } catch (error) {
+          console.error("Error checking subscriber status:", error);
+          setIsApprovedMember(false);
+        }
+      } else {
+        setIsApprovedMember(false);
+      }
+      
       setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [adminUid]);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -46,6 +64,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     isAdmin,
+    isApprovedMember,
     signInWithGoogle,
     signOut
   };

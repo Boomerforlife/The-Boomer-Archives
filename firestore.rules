@@ -14,8 +14,7 @@ service cloud.firestore {
     }
 
     match /posts/{postId} {
-      // Anyone can read published posts (Landing/Archive cards need this)
-      // Admin can read all posts including drafts
+      // Anyone can read any published post (Metadata needed for Landing Page)
       allow read: if resource.data.status == 'published' || isAdmin();
 
       // Hearts: any visitor can increment by exactly 1 (anonymous engagement)
@@ -35,6 +34,12 @@ service cloud.firestore {
     match /comments/{commentId} {
       allow read: if true;
       allow create: if isMember();
+      allow update, delete: if isAdmin();
+    }
+
+    match /subscribers/{subscriberId} {
+      allow create: if true;
+      allow read: if (request.auth != null && request.auth.token.email == subscriberId) || isAdmin();
       allow update, delete: if isAdmin();
     }
   }

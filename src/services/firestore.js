@@ -17,6 +17,7 @@ import {
 const POSTS_COLLECTION = 'posts';
 const SERIES_COLLECTION = 'series';
 const COMMENTS_COLLECTION = 'comments';
+const SUBSCRIBERS_COLLECTION = 'subscribers';
 
 export const generateSlug = (title) => {
   return title
@@ -86,6 +87,7 @@ export const createPost = async (postData) => {
   const docRef = doc(db, POSTS_COLLECTION, slug);
   await setDoc(docRef, {
     ...dataToSave,
+    visibility: dataToSave.visibility || 'public',
     createdAt: serverTimestamp(),
     publishedAt: dataToSave.status === 'published' ? serverTimestamp() : null,
     updatedAt: serverTimestamp(),
@@ -168,4 +170,42 @@ export const addComment = async (postId, commentData) => {
     createdAt: serverTimestamp()
   });
   return docRef;
+};
+
+// --- Subscribers ---
+export const addSubscriber = async (email, name) => {
+  const docRef = doc(db, SUBSCRIBERS_COLLECTION, email);
+  await setDoc(docRef, {
+    email,
+    name: name || '',
+    status: 'pending',
+    date: serverTimestamp()
+  });
+  return docRef;
+};
+
+export const getSubscriberByEmail = async (email) => {
+  const docRef = doc(db, SUBSCRIBERS_COLLECTION, email);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return { ...docSnap.data(), id: docSnap.id };
+  }
+  return null;
+};
+
+export const getAllSubscribers = async () => {
+  const q = query(
+    collection(db, SUBSCRIBERS_COLLECTION),
+    orderBy('date', 'desc')
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const updateSubscriberStatus = async (email, newStatus) => {
+  const docRef = doc(db, SUBSCRIBERS_COLLECTION, email);
+  await updateDoc(docRef, {
+    status: newStatus,
+    updatedAt: serverTimestamp()
+  });
 };

@@ -8,7 +8,7 @@ const DataContext = createContext();
 export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, currentUser } = useAuth();
   const [posts, setPosts] = useState([]);
   const [allPosts, setAllPosts] = useState([]); // For admin
   const [series, setSeries] = useState([]);
@@ -65,7 +65,7 @@ export const DataProvider = ({ children }) => {
       unsubscribeAllPosts();
       unsubscribeSeries();
     };
-  }, [isAdmin]);
+  }, [isAdmin, currentUser]);
 
   const value = {
     posts,

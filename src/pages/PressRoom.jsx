@@ -7,7 +7,7 @@ import CardDesigner from '../components/press/CardDesigner';
 import SeriesOrchestrator from '../components/press/SeriesOrchestrator';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
-import { createPost, updatePost, createSeries, assignPostToSeries } from '../services/firestore';
+import { createPost, updatePost, createSeries, assignPostToSeries, getAllSubscribers, updateSubscriberStatus } from '../services/firestore';
 
 const PressRoom = () => {
   const { isAdmin, currentUser } = useAuth();
@@ -26,12 +26,28 @@ const PressRoom = () => {
     category: 'Draft',
     editorialTag: '',
     isFeatured: false,
+    visibility: 'public',
     seriesId: null,
     seriesOrder: null,
     status: 'draft'
   });
 
   const [saving, setSaving] = useState(false);
+  const [subscribers, setSubscribers] = useState([]);
+
+  useEffect(() => {
+    if (activeTab === 'subscribers') {
+      const loadSubs = async () => {
+        try {
+          const subs = await getAllSubscribers();
+          setSubscribers(subs);
+        } catch (error) {
+          console.error("Error loading subscribers", error);
+        }
+      };
+      loadSubs();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     // If we select an existing post, populate the editor
@@ -110,6 +126,16 @@ const PressRoom = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleInsertImage = () => {
+    const url = window.prompt('Enter image URL:');
+    if (!url) return;
+    
+    const altText = window.prompt('Enter a brief description (alt text):') || 'image';
+    const imageMarkdown = `\n![${altText}](${url})\n`;
+    
+    setContent(prev => prev + imageMarkdown);
   };
 
   return (
@@ -191,6 +217,17 @@ const PressRoom = () => {
                   <span className="material-symbols-outlined">collections_bookmark</span>
                   <span className="text-xs font-medium uppercase tracking-widest label-text">Series</span>
                 </button>
+                <button
+                  onClick={() => setActiveTab('subscribers')}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-200 text-left ${
+                    activeTab === 'subscribers'
+                      ? 'bg-surface-container-high text-on-surface font-bold'
+                      : 'text-on-surface-variant hover:bg-surface-variant'
+                  }`}
+                >
+                  <span className="material-symbols-outlined">group</span>
+                  <span className="text-xs font-medium uppercase tracking-widest label-text">Subscribers</span>
+                </button>
               </nav>
             </div>
           </section>
@@ -216,6 +253,13 @@ const PressRoom = () => {
                     </button>
                     <button className="material-symbols-outlined text-outline hover:text-on-surface transition-colors" title="Link">
                       link
+                    </button>
+                    <button 
+                      onClick={handleInsertImage} 
+                      className="material-symbols-outlined text-outline hover:text-on-surface transition-colors" 
+                      title="Insert Image URL"
+                    >
+                      image
                     </button>
                   </div>
                   <div className="flex gap-2">
@@ -261,6 +305,17 @@ const PressRoom = () => {
                   <div className="flex-1 text-right text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant/40">
                     Words: {wordCount} · Est. {readTime} min
                   </div>
+                </div>
+                <div className="mt-6 flex items-center gap-4">
+                  <span className="text-xs font-medium text-on-surface-variant">Visibility:</span>
+                  <select 
+                    value={currentPost.visibility || 'public'} 
+                    onChange={(e) => setCurrentPost({...currentPost, visibility: e.target.value})}
+                    className="bg-transparent border border-outline-variant/30 text-xs text-on-surface-variant px-3 py-1 rounded focus:outline-none focus:border-primary"
+                  >
+                    <option value="public">Public</option>
+                    <option value="private">Members Only</option>
+                  </select>
                 </div>
               </div>
             </section>
@@ -311,6 +366,57 @@ const PressRoom = () => {
                   onCreateSeries={handleCreateSeries}
                   onAssignPost={handleAssignPost}
                 />
+              </div>
+            </section>
+          )}
+
+          {activeTab === 'subscribers' && (
+            <section className="flex-1 bg-surface-container-lowest p-8 md:p-16 overflow-y-auto">
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-2xl font-headline italic font-bold text-on-surface mb-8">
+                  Subscriber Management
+                </h2>
+                <div className="bg-surface-container-high rounded-xl overflow-hidden whisper-shadow">
+                  {subscribers.length === 0 ? (
+                    <div className="p-8 text-center text-on-surface-variant italic font-serif">
+                      No subscribers found.
+                    </div>
+                  ) : (
+                    <ul className="divide-y divide-outline-variant/10">
+                      {subscribers.map(sub => (
+                        <li key={sub.id} className="flex items-center justify-between p-6 hover:bg-surface-variant transition-colors">
+                          <div>
+                            <span className="block text-on-surface font-medium">
+                              {sub.name ? `${sub.name} (${sub.email})` : sub.email}
+                            </span>
+                            <span className="block text-xs text-on-surface-variant mt-1">
+                              Status: <strong className={sub.status === 'approved' ? 'text-primary' : 'text-error'}>{sub.status.toUpperCase()}</strong> • Date: {sub.date?.toDate().toLocaleDateString() || 'Recently'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const newStatus = sub.status === 'approved' ? 'pending' : 'approved';
+                                await updateSubscriberStatus(sub.email, newStatus);
+                                setSubscribers(prev => prev.map(s => 
+                                  s.email === sub.email ? { ...s, status: newStatus } : s
+                                ));
+                              } catch(e) {
+                                alert('Failed to update status');
+                              }
+                            }}
+                            className={sub.status === 'approved' 
+                              ? "bg-surface-container-highest text-on-surface hover:bg-error hover:text-error-container px-4 py-2 rounded text-xs font-medium uppercase tracking-widest label-text transition-colors"
+                              : "bg-primary/10 text-primary hover:bg-primary hover:text-on-primary px-4 py-2 rounded text-xs font-medium uppercase tracking-widest label-text transition-colors"
+                            }
+                          >
+                            {sub.status === 'approved' ? 'Revoke' : 'Approve'}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </section>
           )}

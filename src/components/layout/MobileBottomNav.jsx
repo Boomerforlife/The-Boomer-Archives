@@ -1,9 +1,11 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import TransitionLink from '../common/TransitionLink';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const MobileBottomNav = () => {
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
   
   const isActive = (path) => location.pathname === path;
 
@@ -18,9 +20,12 @@ const MobileBottomNav = () => {
       <TransitionLink to="/press-room" className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
         <span className="material-symbols-outlined">add</span>
       </TransitionLink>
-      <TransitionLink to="/archive" className="material-symbols-outlined text-on-surface-variant">
-        search
-      </TransitionLink>
+      <button 
+        onClick={toggleTheme} 
+        className="material-symbols-outlined text-on-surface-variant transition-transform duration-500"
+      >
+        {theme === 'dark' ? 'dark_mode' : 'light_mode'}
+      </button>
       <TransitionLink to="/member" className="material-symbols-outlined text-on-surface-variant">
         person
       </TransitionLink>

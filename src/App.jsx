@@ -10,6 +10,7 @@ import ColophonBlooper from './pages/ColophonBlooper';
 import LoadingScreen from './components/common/LoadingScreen';
 import TransitionOverlay from './components/common/TransitionOverlay';
 import LoginPage from './pages/LoginPage';
+import SubscribePage from './pages/SubscribePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -87,6 +88,7 @@ function AppContent() {
             <Route path="/press-room" element={<PressRoom />} />
             <Route path="/member" element={<MemberPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/subscribe" element={<SubscribePage />} />
             <Route path="/legal" element={<LegalBlooper />} />
             <Route path="/colophon" element={<ColophonBlooper />} />
             <Route path="*" element={<Navigate to="/" />} />

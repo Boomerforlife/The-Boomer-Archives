@@ -15,7 +15,7 @@ import { getCommentsForPost, addComment, incrementHearts } from '../services/fir
 const ArticlePage = () => {
   const { id } = useParams();
   const { posts, series, loading } = useData();
-  const { currentUser, signInWithGoogle } = useAuth();
+  const { currentUser, isApprovedMember, signInWithGoogle } = useAuth();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -97,7 +97,7 @@ const ArticlePage = () => {
       
       <main className="pt-32 pb-20 px-6 lg:pl-80 lg:pr-12 max-w-7xl mx-auto">
         {/* Reader Container */}
-        <article className="bg-[#fffcf9] rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(34,26,14,0.04)] border border-outline-variant/10">
+        <article className="bg-surface-container-lowest rounded-xl overflow-hidden whisper-shadow border border-outline-variant/10">
           {/* Hero Image Section */}
           <div className="w-full h-[460px] overflow-hidden">
             <img 
@@ -146,8 +146,20 @@ const ArticlePage = () => {
               {post.title}
             </h1>
 
-            {!currentUser ? (
-              <AuthModal />
+            {post.visibility === 'private' && !isApprovedMember ? (
+              <div className="text-center py-16 bg-surface-container-low rounded-xl border border-outline-variant/10 my-12 shadow-sm">
+                <span className="material-symbols-outlined text-5xl text-outline mb-4">lock</span>
+                <h2 className="text-2xl font-headline italic font-bold text-on-surface mb-4">Members Only Volume</h2>
+                <p className="text-on-surface-variant max-w-md mx-auto mb-8">
+                  You are not a member yet. Would you like to become a member to read this reflection and others like it?
+                </p>
+                <TransitionLink 
+                  to="/subscribe"
+                  className="inline-flex items-center gap-2 bg-primary text-on-primary py-3 px-8 rounded-full text-xs font-medium uppercase tracking-widest label-text hover:opacity-90 transition-all"
+                >
+                  Subscribe Here
+                </TransitionLink>
+              </div>
             ) : (
               <>
                 {/* Body Content */}
