@@ -74,6 +74,9 @@ export const createPost = async (postData) => {
   if (!dataToSave.title || typeof dataToSave.title !== 'string' || dataToSave.title.trim().length === 0) {
     throw new Error('Post title is required and must be a non-empty string.');
   }
+  if (dataToSave.title.length > 300) {
+    throw new Error('Post title must be 300 characters or fewer.');
+  }
   if (dataToSave.content && typeof dataToSave.content !== 'string') {
     throw new Error('Post content must be a string.');
   }
@@ -163,9 +166,28 @@ export const getCommentsForPost = async (postId) => {
 
 export const addComment = async (postId, commentData) => {
   const { id, ...dataToSave } = commentData;
+
+  // Security: validate comment content before writing
+  if (!dataToSave.content || typeof dataToSave.content !== 'string' || dataToSave.content.trim().length === 0) {
+    throw new Error('Comment content is required.');
+  }
+  if (dataToSave.content.length > 2000) {
+    throw new Error('Comment must be 2000 characters or fewer.');
+  }
+  if (!dataToSave.author || typeof dataToSave.author !== 'string' || dataToSave.author.length > 100) {
+    throw new Error('Invalid author name.');
+  }
+  if (!dataToSave.uid) {
+    throw new Error('User ID is required to post a comment.');
+  }
+
   const docRef = doc(collection(db, COMMENTS_COLLECTION));
   await setDoc(docRef, {
-    ...dataToSave,
+    author: dataToSave.author,
+    initials: dataToSave.initials || '',
+    content: dataToSave.content,
+    date: dataToSave.date || '',
+    uid: dataToSave.uid,
     postId,
     createdAt: serverTimestamp()
   });
@@ -174,6 +196,15 @@ export const addComment = async (postId, commentData) => {
 
 // --- Subscribers ---
 export const addSubscriber = async (email, name) => {
+  // Security: validate email format and name length
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || typeof email !== 'string' || !emailRegex.test(email)) {
+    throw new Error('A valid email address is required.');
+  }
+  if (name && (typeof name !== 'string' || name.length > 100)) {
+    throw new Error('Name must be 100 characters or fewer.');
+  }
+
   const docRef = doc(db, SUBSCRIBERS_COLLECTION, email);
   await setDoc(docRef, {
     email,

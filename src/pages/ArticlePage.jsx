@@ -74,8 +74,9 @@ const ArticlePage = () => {
       const commentData = {
         author: currentUser.displayName || 'Anonymous',
         initials: initials,
-        content: newComment,
-        date: new Date().toLocaleDateString()
+        content: newComment.slice(0, 2000),
+        date: new Date().toLocaleDateString(),
+        uid: currentUser.uid
       };
       
       await addComment(id, commentData);
@@ -181,9 +182,11 @@ const ArticlePage = () => {
                       ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
                                       'ul', 'ol', 'li', 'a', 'strong', 'em', 'code', 'pre',
                                       'br', 'hr', 'img'],
-                      ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class'],
-                      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'style'],
-                      FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover']
+                      ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt'],
+                      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'style', 'svg', 'math'],
+                      FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit', 'class', 'style', 'id'],
+                      ALLOW_UNKNOWN_PROTOCOLS: false,
+                      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i
                     })}
                   </ReactMarkdown>
                 </div>
