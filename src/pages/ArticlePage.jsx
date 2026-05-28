@@ -96,11 +96,11 @@ const ArticlePage = () => {
       <TopAppBar />
       <SideNavBar />
       
-      <main className="pt-32 pb-20 px-6 lg:pl-80 lg:pr-12 max-w-7xl mx-auto">
+      <main className="pt-32 pb-32 px-6 lg:pl-80 lg:pr-12 max-w-7xl mx-auto">
         {/* Reader Container */}
         <article className="bg-surface-container-lowest rounded-xl overflow-hidden whisper-shadow border border-outline-variant/10">
           {/* Hero Image Section */}
-          <div className="w-full h-[460px] overflow-hidden">
+          <div className="w-full h-64 md:h-[460px] overflow-hidden">
             <img 
               src={post.coverImage} 
               alt={post.title}

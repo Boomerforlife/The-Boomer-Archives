@@ -16,6 +16,7 @@ const PressRoom = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [activeTab, setActiveTab] = useState('write');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [currentPost, setCurrentPost] = useState({
     id: 'new',
@@ -149,7 +150,17 @@ const PressRoom = () => {
         {/* Editor Content Canvas */}
         <main className="flex-1 flex flex-col md:flex-row bg-surface-dim overflow-hidden">
           {/* Drafts/Navigation Panel */}
-          <section className="w-full md:w-80 border-r border-outline-variant/10 bg-surface-container-low/50 backdrop-blur-sm p-6 overflow-y-auto hidden md:block">
+          <section className={`w-full md:w-80 border-r border-outline-variant/10 bg-surface-container-low/95 md:bg-surface-container-low/50 backdrop-blur-md p-6 overflow-y-auto ${isMobileMenuOpen ? 'fixed inset-0 z-[60]' : 'hidden md:block md:relative'}`}>
+            <div className="flex justify-between items-center mb-8 md:hidden">
+              <h2 className="font-headline italic text-on-surface text-lg">Menu</h2>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="material-symbols-outlined text-on-surface-variant p-2"
+              >
+                close
+              </button>
+            </div>
+            
             <div className="mb-8">
               <h2 className="text-[10px] font-medium uppercase tracking-widest label-text text-on-surface-variant mb-4">
                 All Entries
@@ -234,11 +245,18 @@ const PressRoom = () => {
 
           {/* Main Content Area - Changes based on active tab */}
           {activeTab === 'write' && (
-            <section className="flex-1 bg-surface-container-lowest p-8 md:p-16 lg:p-24 overflow-y-auto">
+            <section className="flex-1 bg-surface-container-lowest p-4 md:p-16 lg:p-24 overflow-y-auto pb-24 md:pb-16">
               <div className="max-w-2xl mx-auto editor-container">
                 {/* Formatting Controls */}
-                <div className="sticky top-0 mb-12 flex items-center justify-between border-b border-outline-variant/10 pb-4 bg-white/80 backdrop-blur-sm z-10">
-                  <div className="flex items-center gap-6">
+                <div className="sticky top-0 mb-8 md:mb-12 flex items-center justify-between border-b border-outline-variant/10 pb-4 bg-white/80 backdrop-blur-sm z-10">
+                  <div className="flex items-center gap-3 md:gap-6 overflow-x-auto no-scrollbar">
+                    <button 
+                      onClick={() => setIsMobileMenuOpen(true)}
+                      className="md:hidden material-symbols-outlined text-primary mr-2" 
+                      title="Menu"
+                    >
+                      menu
+                    </button>
                     <button className="material-symbols-outlined text-outline hover:text-on-surface transition-colors" title="Bold">
                       format_bold
                     </button>
@@ -334,11 +352,18 @@ const PressRoom = () => {
           )}
 
           {activeTab === 'design' && (
-            <section className="flex-1 bg-surface-container-lowest p-8 md:p-16 overflow-y-auto">
+            <section className="flex-1 bg-surface-container-lowest p-4 md:p-16 lg:p-24 overflow-y-auto pb-24 md:pb-16 flex flex-col gap-12">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl font-headline italic font-bold text-on-surface mb-8">
-                  Card Designer
-                </h2>
+                <div className="flex items-center gap-4 mb-8">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="md:hidden material-symbols-outlined text-primary" 
+                    title="Menu"
+                  >
+                    menu
+                  </button>
+                  <h1 className="font-headline text-3xl italic font-bold text-on-surface">Card Designer</h1>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <CardDesigner post={currentPost} onUpdate={handleUpdatePost} />
                   <div className="space-y-6">
@@ -367,11 +392,18 @@ const PressRoom = () => {
           )}
 
           {activeTab === 'series' && (
-            <section className="flex-1 bg-surface-container-lowest p-8 md:p-16 overflow-y-auto">
+            <section className="flex-1 bg-surface-container-lowest p-4 md:p-16 lg:p-24 overflow-y-auto pb-24 md:pb-16">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl font-headline italic font-bold text-on-surface mb-8">
-                  Series Orchestrator
-                </h2>
+                <div className="flex items-center gap-4 mb-8">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="md:hidden material-symbols-outlined text-primary" 
+                    title="Menu"
+                  >
+                    menu
+                  </button>
+                  <h1 className="font-headline text-3xl italic font-bold text-on-surface">Series Orchestrator</h1>
+                </div>
                 <SeriesOrchestrator
                   posts={allPosts}
                   series={series}
@@ -383,11 +415,18 @@ const PressRoom = () => {
           )}
 
           {activeTab === 'subscribers' && (
-            <section className="flex-1 bg-surface-container-lowest p-8 md:p-16 overflow-y-auto">
+            <section className="flex-1 bg-surface-container-lowest p-4 md:p-16 lg:p-24 overflow-y-auto pb-24 md:pb-16">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl font-headline italic font-bold text-on-surface mb-8">
-                  Subscriber Management
-                </h2>
+                <div className="flex items-center gap-4 mb-8">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="md:hidden material-symbols-outlined text-primary" 
+                    title="Menu"
+                  >
+                    menu
+                  </button>
+                  <h1 className="font-headline text-3xl italic font-bold text-on-surface">Subscriber Management</h1>
+                </div>
                 <div className="bg-surface-container-high rounded-xl overflow-hidden whisper-shadow">
                   {subscribers.length === 0 ? (
                     <div className="p-8 text-center text-on-surface-variant italic font-serif">

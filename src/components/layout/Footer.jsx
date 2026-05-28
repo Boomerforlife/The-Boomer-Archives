@@ -5,7 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 const Footer = () => {
   const { theme, toggleTheme } = useTheme();
   return (
-    <footer className="bg-surface-dim w-full py-12 border-t border-outline-variant/10 mt-20">
+    <footer className="bg-surface-dim w-full pt-12 pb-32 md:pb-12 border-t border-outline-variant/10 mt-20">
       <div className="flex flex-col items-center gap-4 w-full text-center">
         <div className="flex gap-8">
           <TransitionLink to="/legal" className="text-xs font-sans tracking-wide text-on-surface-variant hover:text-on-surface transition-colors">

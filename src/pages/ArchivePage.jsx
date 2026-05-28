@@ -63,7 +63,7 @@ const ArchivePage = () => {
       <TopAppBar />
       <SideNavBar />
       
-      <main className="pt-24 min-h-screen">
+      <main className="pt-24 pb-32 md:pb-0 min-h-screen">
         <div className="px-8 py-12">
           {/* Search Section */}
           <section className="mb-20">
