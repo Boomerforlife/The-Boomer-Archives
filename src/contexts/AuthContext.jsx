@@ -21,7 +21,13 @@ export const AuthProvider = ({ children }) => {
   const adminUid = process.env.REACT_APP_ADMIN_UID || '';
 
   useEffect(() => {
+    // Fallback timeout: if auth takes too long (e.g. App Check fails/network drop), force UI to load
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      clearTimeout(timeoutId); // Clear timeout if auth resolves normally
       setCurrentUser(user);
       
       const isAdminUser = user && user.uid === adminUid;
@@ -42,7 +48,10 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, [adminUid]);
 
   const signInWithGoogle = async () => {
