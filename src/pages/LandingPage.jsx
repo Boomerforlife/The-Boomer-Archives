@@ -17,6 +17,7 @@ const LandingPage = () => {
   const cardRefs = useRef([]);
   const vantaRef = useRef(null);
   const [showTopBar, setShowTopBar] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const [showSentinel, setShowSentinel] = useState(false);
@@ -45,6 +46,7 @@ const LandingPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       setShowTopBar(window.scrollY > window.innerHeight * 0.8);
+      setShowScrollIndicator(window.scrollY < 50);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -110,7 +112,11 @@ const LandingPage = () => {
     };
   }, [theme]);
 
-  const featuredPosts = posts.slice(0, 4);
+  const displayPosts = [...posts].sort((a, b) => {
+    if (a.isFeatured && !b.isFeatured) return -1;
+    if (!a.isFeatured && b.isFeatured) return 1;
+    return 0;
+  }).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -142,6 +148,12 @@ const LandingPage = () => {
               Expressing Personalities One at a Time
             </p>
           </div>
+
+          {/* Scroll Down Indicator */}
+          <div className={`absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-opacity duration-700 ${showScrollIndicator ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-on-surface/80 drop-shadow-md">Scroll Down</span>
+            <span className="material-symbols-outlined text-on-surface/80 animate-bounce drop-shadow-md">keyboard_arrow_down</span>
+          </div>
         </section>
 
         {/* Content starts after full-screen hero */}
@@ -149,7 +161,7 @@ const LandingPage = () => {
           <div className="px-8 max-w-7xl mx-auto">
             {/* Featured Cards */}
             <div className="space-y-12">
-              {!loading && featuredPosts.map((post, index) => (
+              {!loading && displayPosts.map((post, index) => (
                 <article
                   key={post.id}
                   ref={el => cardRefs.current[index] = el}

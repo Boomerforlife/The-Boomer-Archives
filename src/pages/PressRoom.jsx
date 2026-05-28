@@ -316,6 +316,18 @@ const PressRoom = () => {
                     <option value="public">Public</option>
                     <option value="private">Members Only</option>
                   </select>
+                  <div className="flex items-center gap-2 border-l border-outline-variant/30 pl-4">
+                    <input 
+                      type="checkbox" 
+                      id="isFeatured"
+                      checked={currentPost.isFeatured || false} 
+                      onChange={(e) => setCurrentPost({...currentPost, isFeatured: e.target.checked})}
+                      className="accent-primary cursor-pointer w-4 h-4"
+                    />
+                    <label htmlFor="isFeatured" className="text-xs font-medium text-on-surface-variant cursor-pointer">
+                      Pin to Landing Page
+                    </label>
+                  </div>
                 </div>
               </div>
             </section>
