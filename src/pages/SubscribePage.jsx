@@ -4,13 +4,20 @@ import TopAppBar from '../components/layout/TopAppBar';
 import Footer from '../components/layout/Footer';
 import { addSubscriber } from '../services/firestore';
 import { useAuth } from '../contexts/AuthContext';
+import { z } from 'zod';
 
 const SubscribePage = () => {
   const { currentUser, isApprovedMember, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [validationError, setValidationError] = useState('');
   const navigate = useNavigate();
+
+  const subscribeSchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be under 100 characters"),
+    email: z.string().email("Invalid email address")
+  });
 
   useEffect(() => {
     if (currentUser) {
@@ -22,6 +29,15 @@ const SubscribePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) return;
+    
+    try {
+      subscribeSchema.parse({ name: name.trim(), email: email.trim() });
+      setValidationError('');
+    } catch (err) {
+      setValidationError(err.errors[0].message);
+      return;
+    }
+
     setStatus('loading');
     try {
       await addSubscriber(email, name);
@@ -86,7 +102,7 @@ const SubscribePage = () => {
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => { setName(e.target.value); setValidationError(''); }}
                     placeholder="Enter your name"
                     required
                     className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
@@ -107,6 +123,9 @@ const SubscribePage = () => {
                   >
                     {status === 'loading' ? 'Submitting...' : 'Request Access'}
                   </button>
+                  {validationError && (
+                    <p className="text-error text-sm mt-2">{validationError}</p>
+                  )}
                   {status === 'error' && (
                     <p className="text-error text-sm mt-2">Failed to submit request. Please try again.</p>
                   )}

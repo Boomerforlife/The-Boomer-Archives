@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import DOMPurify from 'dompurify';
+import { z } from 'zod';
 import TransitionLink from '../components/common/TransitionLink';
 import TopAppBar from '../components/layout/TopAppBar';
 import SideNavBar from '../components/layout/SideNavBar';
@@ -20,6 +21,13 @@ const ArticlePage = () => {
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [hasHearted, setHasHearted] = useState(false);
+  const [commentError, setCommentError] = useState('');
+
+  const commentSchema = z.object({
+    content: z.string()
+      .min(1, "Reflections cannot be empty")
+      .max(2000, "Reflections must be under 2000 characters")
+  });
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -63,7 +71,16 @@ const ArticlePage = () => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim() || !currentUser) return;
+    if (!currentUser) return;
+    
+    try {
+      commentSchema.parse({ content: newComment.trim() });
+      setCommentError('');
+    } catch (err) {
+      setCommentError(err.errors[0].message);
+      return;
+    }
+
     setSubmitting(true);
     
     try {
@@ -278,10 +295,11 @@ const ArticlePage = () => {
                   </p>
                   <textarea
                     value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
+                    onChange={(e) => { setNewComment(e.target.value); setCommentError(''); }}
                     placeholder="Share your reflections..."
-                    className="w-full bg-surface p-4 rounded border border-outline-variant/30 focus:ring-1 focus:ring-primary focus:outline-none min-h-[120px] mb-4 text-sm"
+                    className="w-full bg-surface p-4 rounded border border-outline-variant/30 focus:ring-1 focus:ring-primary focus:outline-none min-h-[120px] mb-2 text-sm"
                   ></textarea>
+                  {commentError && <p className="text-error text-xs mb-4">{commentError}</p>}
                   <button 
                     type="submit"
                     disabled={submitting || !newComment.trim()}

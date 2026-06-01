@@ -63,8 +63,9 @@ service cloud.firestore {
       allow create: if isMember()
                     && subscriberId == request.auth.token.email
                     && request.resource.data.email == request.auth.token.email
+                    && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$')
                     && request.resource.data.status == 'pending'
-                    && (!('name' in request.resource.data) || request.resource.data.name.size() <= 100);
+                    && (!('name' in request.resource.data) || isValidString(request.resource.data.name, 100));
 
       allow read: if (request.auth != null && request.auth.token.email == subscriberId) || isAdmin();
       allow update, delete: if isAdmin();
