@@ -55,8 +55,25 @@ const PressRoom = () => {
     if (currentPost.id !== 'new') {
       setTitle(currentPost.title || '');
       setContent(currentPost.content || '');
+    } else {
+      // Load draft from local storage
+      const savedDraft = localStorage.getItem('pressRoom_draft');
+      if (savedDraft) {
+        try {
+          const { title: savedTitle, content: savedContent } = JSON.parse(savedDraft);
+          setTitle(savedTitle || '');
+          setContent(savedContent || '');
+        } catch (e) {
+          console.error('Failed to parse draft from local storage');
+        }
+      } else {
+        setTitle('');
+        setContent('');
+      }
     }
   }, [currentPost.id]);
+
+
 
   if (!loading && !isAdmin) {
     return <Navigate to="/" state={{ showSentinelMessage: true }} replace />;
@@ -116,6 +133,7 @@ const PressRoom = () => {
           }
         });
         setCurrentPost({ ...postData, id: docRef.id });
+        localStorage.removeItem('pressRoom_draft');
       } else {
         await updatePost(currentPost.id, postData);
         setCurrentPost(postData);
@@ -136,7 +154,13 @@ const PressRoom = () => {
     const altText = window.prompt('Enter a brief description (alt text):') || 'image';
     const imageMarkdown = `\n![${altText}](${url})\n`;
     
-    setContent(prev => prev + imageMarkdown);
+    setContent(prev => {
+      const newContent = prev + imageMarkdown;
+      if (currentPost.id === 'new') {
+        localStorage.setItem('pressRoom_draft', JSON.stringify({ title, content: newContent }));
+      }
+      return newContent;
+    });
   };
 
   return (
@@ -302,7 +326,12 @@ const PressRoom = () => {
                 <input
                   type="text"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    if (currentPost.id === 'new') {
+                      localStorage.setItem('pressRoom_draft', JSON.stringify({ title: e.target.value, content }));
+                    }
+                  }}
                   className="text-4xl md:text-5xl font-headline italic tracking-tight mb-8 text-on-surface bg-transparent border-none focus:ring-0 w-full placeholder:text-outline-variant"
                   placeholder="Enter title..."
                 />
@@ -310,7 +339,12 @@ const PressRoom = () => {
                 {/* Editor Canvas */}
                 <textarea
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={(e) => {
+                    setContent(e.target.value);
+                    if (currentPost.id === 'new') {
+                      localStorage.setItem('pressRoom_draft', JSON.stringify({ title, content: e.target.value }));
+                    }
+                  }}
                   className="writing-canvas w-full bg-transparent border-none focus:ring-0 focus:outline-none text-lg md:text-xl leading-relaxed text-secondary resize-none min-h-[400px]"
                   placeholder="Begin your entry..."
                 />

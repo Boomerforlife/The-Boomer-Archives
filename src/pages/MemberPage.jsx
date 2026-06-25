@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const MemberPage = () => {
   const { posts } = useData();
-  const { currentUser, signInWithGoogle, isAdmin } = useAuth();
+  const { currentUser, signInWithGoogle, isAdmin, signOut } = useAuth();
 
   // Simulated reading journal data using the real posts
   const recentlyReadPosts = posts.slice(0, 2);
@@ -38,7 +38,14 @@ const MemberPage = () => {
               <p className="text-on-surface-variant mt-1">
                 Curating the tactile since {new Date().getFullYear()}
               </p>
-              {!currentUser && (
+              {currentUser ? (
+                <button
+                  onClick={signOut}
+                  className="mt-3 text-sm font-bold text-error hover:opacity-80 transition-opacity"
+                >
+                  Sign out
+                </button>
+              ) : (
                 <button
                   onClick={signInWithGoogle}
                   className="mt-3 text-sm font-bold text-primary hover:text-secondary transition-colors"

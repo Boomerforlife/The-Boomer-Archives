@@ -14,22 +14,22 @@ const Footer = () => {
           <TransitionLink to="/legal" className="text-xs font-sans tracking-wide text-on-surface-variant hover:text-on-surface transition-colors">
             Terms
           </TransitionLink>
-          <TransitionLink to="/colophon" className="text-xs font-sans tracking-wide text-on-surface-variant hover:text-on-surface transition-colors underline decoration-1 underline-offset-4">
+          <TransitionLink to="/colophon" className="text-xs font-sans tracking-wide text-on-surface-variant hover:text-on-surface transition-colors">
             Colophon
           </TransitionLink>
         </div>
         <p className="text-xs font-sans tracking-wide text-on-surface-variant">
-          © 2024 The Boomer Archives
+          © 2026 The Boomer Archives
         </p>
         <div className="mt-4 flex gap-4 items-center">
           <span className="material-symbols-outlined text-primary cursor-pointer hover:text-on-surface transition-colors">share</span>
           <TransitionLink to="/subscribe" className="flex items-center">
             <span className="material-symbols-outlined text-primary cursor-pointer hover:text-on-surface transition-colors">mail</span>
           </TransitionLink>
-          
+
           <div className="w-px h-4 bg-outline-variant/30 mx-2"></div>
-          
-          <button 
+
+          <button
             onClick={toggleTheme}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container hover:bg-surface-variant transition-colors border border-outline-variant/30"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
